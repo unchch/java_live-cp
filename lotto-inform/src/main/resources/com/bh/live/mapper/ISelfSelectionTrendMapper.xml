@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.SelfSelectionTrendDao">
+
+    <select id="querySelfSelectionTrend" parameterType="java.lang.Integer" resultType="com.bh.live.model.inform.StatHistoryDraw">
+            select expect,crown_sub crownSub,open_code openCode,open_time openTime
+            from t_variety_current
+            <if test="variety!=null">
+                where  variety_type = ${variety}
+            </if>
+             ORDER BY expect desc limit #{expect}
+    </select>
+
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.AttentionDao">
+
+    <select id="queryAttentListPage" resultType="com.bh.live.pojo.res.user.AttentionUserRes">
+        SELECT
+        u.id,
+        u.nickname,
+        u.image_url,
+        u.is_anchor,
+        u.is_expert
+        FROM
+        lotto_live_user u
+        WHERE
+        u.id IN (
+        SELECT target_id
+        FROM lotto_attention
+        WHERE is_attent = 1 AND user_id = #{userId}
+        )
+        <if test="type != -1 ">
+            AND is_expert =#{type}
+        </if>
+    </select>
+
+    <select id="attentionListAsUser" resultType="com.bh.live.pojo.res.anchor.FansListRes">
+      select la.user_id,lu.image_url icon FROM lotto_attention la
+      left join lotto_live_user lu on la.user_id=lu.id where la.target_id=#{userId}
+    </select>
+</mapper>

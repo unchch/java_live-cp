@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.OrderDao">
+
+    <select id="queryOrderList"
+            resultType="com.bh.live.pojo.res.trade.OrderFullRes">
+        SELECT
+        t1.id as orderId,
+        t2.id AS userId,
+        t2.nickname,
+        t2.image_url AS imageUrl,
+        t1.lot_seed_name AS lotSeedName,
+        t1.lot_issue_no AS lotIssueNo,
+        t1.award_number AS awardNumber,
+        t1.create_time AS createTime,
+        t1.is_pay AS isPay,
+        t1.order_no AS orderNo,
+        t1.content,
+        CASE
+        WHEN t3.id IS NULL
+        THEN 0
+        ELSE 1
+        END isAttent,
+        CASE
+        WHEN t4.serial_code IS NULL
+        THEN 0
+        ELSE 1
+        END isBuy,
+        t1.pay_amount AS bymoney
+        FROM
+        lotto_order t1
+        INNER JOIN lotto_live_user t2
+        ON t1.account_id = t2.id
+        LEFT JOIN lotto_attention t3
+        ON t1.account_id = t3.target_id
+        <if test="req.userId!=null and req.userId!='' ">
+            AND t3.user_id = #{req.userId}
+        </if>
+        AND t3.is_attent = 1
+        LEFT JOIN lotto_trade_user_order t4
+        ON t4.order_code = t1.order_no
+        <if test="req.userId!=null and req.userId!='' ">
+            AND t4.user_id = #{req.userId}
+        </if>
+        WHERE t1.lot_seed_no=#{req.lotteryCode}
+        AND t1.lot_issue_no=#{req.issue}
+        <if test=" req.isPay!=null and req.isPay!='' ">
+            AND t1.is_pay=#{req.isPay}
+        </if>
+        <if test="req.playNos!=null and req.playNos!='' ">
+            AND t1.order_no in
+            (
+            SELECT
+            a.order_no
+            FROM
+            lotto_order_info a inner join lotto_order b on a.order_no=b.order_no and lot_issue_no = #{req.issue}
+            AND lot_seed_no = #{req.lotteryCode}
+            WHERE
+            a.lot_play_no IN
+            <foreach collection="req.playNos.split(',')" open="(" close=")" separator="," item="nos">
+              #{nos}
+            </foreach>
+            GROUP BY
+            order_no)
+        </if>
+        GROUP BY t1.order_no
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <!--查询未开奖的竞猜方案-->
+    <select id="guessingList" resultType="com.bh.live.pojo.res.trade.GuessingRes">
+        select lo.id,lo.account_id userId,lu.nickname,lo.content,lr.profitrate_value,lo.is_pay
+        from lotto_order lo
+        left join lotto_live_user lu on lu.id=lo.account_id
+        left join lotto_ranking_list lr on lr.user_id=lo.account_id
+        where lo.award_state=0 and lr.rank_period=0 and lo.lot_issue_no=#{lotIssueNo} and lo.lot_seed_no=#{seedNo}
+        order by lo.buy_time desc
+    </select>
+
+    <!--一对多返回结果映射集-->
+    <resultMap id="guessingDetail" type="com.bh.live.pojo.res.trade.GuessingDetailRes">
+        <id column="id" property="id" javaType="java.lang.Integer"></id>
+        <result column="lot_issue_no" property="lotIssueNo" javaType="java.lang.String"></result>
+        <result column="lot_seed_name" property="lotSeedName" javaType="java.lang.String"></result>
+        <result column="userId" property="userId" javaType="java.lang.Integer"></result>
+        <result column="nickname" property="nickname" javaType="java.lang.String"></result>
+        <result column="winLose" property="result10" javaType="java.lang.String"></result>
+        <result column="winProfit10" property="winProfit10" javaType="java.math.BigDecimal"></result>
+        <result column="profitRate10" property="profitRate10" javaType="java.math.BigDecimal"></result>
+        <result column="is_attent" property="isAttent" javaType="java.lang.Integer"></result>
+        <result column="is_pay" property="isPay" javaType="java.lang.Integer"></result>
+        <result column="pay_amount" property="payAmount" javaType="java.math.BigDecimal"></result>
+        <result column="isBuy" property="isBuy" javaType="java.lang.Integer"></result>
+        <!-- 一对多collection中一定要用ofType -->
+        <collection property="guessingResultList" ofType="com.bh.live.pojo.res.trade.GuessingResultListRes">
+            <result column="guessName" property="guessName" javaType="java.lang.String"></result>
+            <result column="content" property="content" javaType="java.lang.String"></result>
+        </collection>
+    </resultMap>
+
+    <!--查询未开奖的竞猜方案详情信息-->
+    <select id="guessingDetail" resultMap="guessingDetail">
+        select lo.id,lo.lot_issue_no,lo.lot_seed_name,lo.account_id userId,lu.nickname,
+        loi.guessName,loi.content,lu.is_attent,lo.is_pay,lo.pay_amount,
+        <!--##把结果转成(输,赢,输,赢,输,赢,和)格式-->
+        (select GROUP_CONCAT((case award_state when 1 then '赢' when 2 then '输' when 3 then '和' end)) from lotto_order
+        where award_state > 0 and account_id = lo.account_id order by buy_time desc limit 10) winLose,
+        (select (count(case when award_state=1 then award_state end)/10) from lotto_order where award_state > 0 and
+        account_id = lo.account_id order by buy_time desc limit 10) winProfit10,
+        (select sum(profit_rate) from lotto_order where award_state > 0 and account_id = lo.account_id order by buy_time
+        desc limit 10) profitRate10,
+        <!--##当前登录用户是否已购买过该订单-->
+        (select count(1) from lotto_trade_user_order tuo where lo.order_no=tuo.order_code and tuo.user_id=#{userId})
+        isBuy
+        from lotto_order lo
+        left join (
+        select u.id,u.nickname,la.is_attent from lotto_live_user u
+        left join lotto_attention la on u.id=la.target_id and la.user_id=#{userId}
+        ) lu on lu.id=lo.account_id
+        left join(
+        <!--##查询竞猜详情，返回多行数据-->
+        select o.order_no,lp.play_name guessName,o.bet_content content from lotto_order_info o
+        left join lotto_play lp on o.lot_play_no = lp.play_no where lp.status=1
+        ) loi on loi.order_no=lo.order_no
+        where lo.id=#{id}
+    </select>
+
+    <select id="queryOrderListSize" resultType="integer">
+        SELECT
+        count(t1.id)
+        FROM
+        lotto_order t1
+        INNER JOIN lotto_live_user t2
+        ON t1.account_id = t2.id
+        LEFT JOIN lotto_attention t3
+        ON t1.account_id = t3.target_id
+        <if test="req.userId!=null and req.userId!='' ">
+            AND t3.user_id = #{req.userId}
+        </if>
+        AND t3.is_attent = 1
+        LEFT JOIN lotto_trade_user_order t4
+        ON t4.order_code = order_no
+        <if test="req.userId!=null and req.userId!='' ">
+            AND t4.user_id = #{req.userId}
+        </if>
+        WHERE t1.lot_seed_no=#{req.lotteryCode}
+        <if test=" req.isPay!=null and req.isPay!='' ">
+            AND t1.is_pay=#{req.isPay}
+        </if>
+        ORDER BY t1.create_time DESC
+    </select>
+
+
+    <select id="selectProfitRate" resultType="com.bh.live.pojo.res.trade.ProfitRateRankRes"
+            parameterType="com.bh.live.pojo.req.trade.ProfitRateRankReq">
+       select (@i:=@i+1) i,account_id as user_id,profit_rate,d.image_url,d.nickname
+        from (select  account_id,sum(profit_rate) as profit_rate  from lotto_order a
+        inner join (select DISTINCT lot_issue_no from lotto_order where lot_seed_no=#{seedNo} and award_state>0 order by lot_issue_no desc limit 0,#{num})
+        b on a.lot_issue_no=b.lot_issue_no
+        group by account_id) c
+        inner join lotto_live_user d on c.account_id=d.id,(select @i:=0) as it
+        order by profit_rate desc limit #{pageStart},#{pageSize}
+    </select>
+
+
+    <select id="selectUserWinRate" resultType="com.bh.live.pojo.res.trade.ProfitRateRankRes"
+            parameterType="com.bh.live.pojo.req.trade.ProfitRateRankReq">
+      select (@i:=@i+1) i,account_id as user_id,ROUND(winRate*100,2) as profit_rate,d.image_url,d.nickname from (
+        select a.account_id,(win/(win+lost)) as winRate from  (select  account_id,count(award_state) as win from lotto_order a
+        inner join (select DISTINCT lot_issue_no from lotto_order where lot_seed_no=#{seedNo} and award_state=1 order by lot_issue_no desc limit 0,#{num})
+        b on a.lot_issue_no=b.lot_issue_no
+        group by account_id) a
+        inner join
+        (select  account_id,count(award_state) as lost from lotto_order a
+        inner join (select DISTINCT lot_issue_no from lotto_order where lot_seed_no=#{seedNo} and award_state>1 order by lot_issue_no desc limit 0,#{num})
+        b on a.lot_issue_no=b.lot_issue_no
+        group by account_id) b
+        on a.account_id=b.account_id) c
+        inner join lotto_live_user d on c.account_id=d.id
+        ,(select @i:=0) as it
+        order by profit_rate desc
+        limit #{pageStart},#{pageSize}
+    </select>
+
+    <select id="selectUserJoinWin" resultType="com.bh.live.pojo.res.trade.ProfitRateRankRes"
+            parameterType="com.bh.live.pojo.req.trade.ProfitRateRankReq">
+       select (@i:=@i+1) i,user_id,b.nickname,b.image_url,join_win_lost as profit_rate from lotto_user_record a
+	   inner join lotto_live_user b on a.user_id=b.id,(select @i:=0) as it
+	   where win_lost_flag=1 and lottery_code=#{seedNo}
+	   order by join_win_lost desc
+	   limit #{pageStart},#{pageSize}
+    </select>
+
+    <select id="queryRecentResultByTen" resultType="string">
+        SELECT
+          GROUP_CONCAT(case t.award_state when 1 then '赢' when 2 then '输' when 3 then '和' end) AS recent
+        FROM
+          (SELECT
+            award_state
+          FROM
+            lotto_order
+          WHERE account_id = #{userId}
+          ORDER BY create_time DESC
+          LIMIT 0, 10) t
+    </select>
+
+    <select id="selectUserPush" resultType="int">
+        select account_id from lotto_order where lot_seed_no=#{seedNo}
+        and lot_issue_no in(SELECT issue_no FROM lotto_issue WHERE seed_no =#{seedNo} AND start_time &lt;=now() AND closing_time >= now())
+        and account_id in(10001)
+    </select>
+
+    <select id="queryPlayNoAndNameBySeedNo" resultType="com.bh.live.pojo.res.trade.LottoPlayNoNameRes">
+        SELECT
+          play_no,
+          play_name
+        FROM
+          lotto_play
+        WHERE play_type = 1
+          AND STATUS = 1
+          AND seed_no = #{seedNo}
+          AND parent_no != 0
+        ORDER BY sort
+    </select>
+
+    <select id="queryOrderListHistoryByUserId" resultType="com.bh.live.pojo.res.trade.HistoryOrderRes">
+        SELECT
+          t1.*,
+          CASE
+            WHEN t2.serial_code IS NULL
+            THEN 0
+            ELSE 1
+          END isBuy
+        FROM
+          lotto_order t1
+          LEFT JOIN lotto_trade_user_order t2
+            ON t2.order_code = t1.order_no
+            <if test="req.curUserId!=null and req.curUserId!='' ">
+                AND t2.user_id = #{req.curUserId}
+            </if>
+        WHERE t1.account_id=#{req.userId}
+        ORDER BY t1.create_time DESC
+    </select>
+</mapper>

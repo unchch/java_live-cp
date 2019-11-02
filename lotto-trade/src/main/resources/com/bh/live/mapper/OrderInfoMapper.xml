@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.OrderInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.trade.OrderInfo">
+        <id column="id" property="id" />
+        <result column="bet_no" property="betNo" />
+        <result column="order_no" property="orderNo" />
+        <result column="status" property="status" />
+        <result column="revoke_reason" property="revokeReason" />
+        <result column="client_type" property="clientType" />
+        <result column="app_id" property="appId" />
+        <result column="app_name" property="appName" />
+        <result column="account_id" property="accountId" />
+        <result column="lot_issue_no" property="lotIssueNo" />
+        <result column="buy_time" property="buyTime" />
+        <result column="bet_content" property="betContent" />
+        <result column="bet_code" property="betCode" />
+        <result column="lot_bit_no" property="lotBitNo" />
+        <result column="lot_bit_content" property="lotBitContent" />
+        <result column="lot_seed_no" property="lotSeedNo" />
+        <result column="lot_seed_name" property="lotSeedName" />
+        <result column="lot_play_no" property="lotPlayNo" />
+        <result column="lot_play_name" property="lotPlayName" />
+        <result column="award_state" property="awardState" />
+        <result column="award_number" property="awardNumber" />
+        <result column="buy_model_multiple" property="buyModelMultiple" />
+        <result column="unit_price" property="unitPrice" />
+        <result column="buy_quantity" property="buyQuantity" />
+        <result column="pay_amount" property="payAmount" />
+        <result column="odds" property="odds" />
+        <result column="rebate" property="rebate" />
+        <result column="rebate_amount" property="rebateAmount" />
+        <result column="award_amount" property="awardAmount" />
+        <result column="profit_amount" property="profitAmount" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="win_quantity" property="winQuantity" />
+        <result column="prize_status" property="prizeStatus" />
+        <result column="lottery_time" property="lotteryTime" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, bet_no, order_no, status, revoke_reason, client_type, app_id, app_name, account_id, lot_issue_no, buy_time, bet_content, bet_code, lot_bit_no, lot_bit_content, lot_seed_no, lot_seed_name, lot_play_no, lot_play_name, award_state, award_number, buy_model_multiple, unit_price, buy_quantity, pay_amount, odds, rebate, rebate_amount, award_amount, profit_amount, create_time, update_time, win_quantity, prize_status, remark,lottery_time
+    </sql>
+
+</mapper>

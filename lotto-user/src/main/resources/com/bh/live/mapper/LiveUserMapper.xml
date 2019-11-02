@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.LiveUserDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.user.LiveUser">
+        <id column="id" property="id" />
+        <result column="nickname" property="nickname" />
+        <result column="image_url" property="imageUrl" />
+        <result column="mobile" property="mobile" />
+        <result column="PASSWORD" property="password" />
+        <result column="sex" property="sex" />
+        <result column="user_grade" property="userGrade" />
+        <result column="terminal" property="terminal" />
+        <result column="is_usable" property="isUsable" />
+        <result column="is_online" property="isOnline" />
+        <result column="is_login" property="isLogin" />
+        <result column="is_publish" property="isPublish" />
+        <result column="is_speak" property="isSpeak" />
+        <result column="lastlogin" property="lastlogin" />
+        <result column="lastip" property="lastip" />
+        <result column="update_time" property="updateTime" />
+        <result column="channel" property="channel" />
+        <result column="creat_time" property="creatTime" />
+        <result column="is_anchor" property="isAnchor"/>
+        <result column="is_expert" property="isExpert"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, nickname, image_url, mobile, PASSWORD, sex, user_grade, terminal, is_usable, is_online, is_login, is_publish, is_speak,is_anchor,is_expert, lastlogin, lastip, update_time, channel, creat_time
+    </sql>
+
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.HongKongLotteryDao">
+	<!-- 香港彩最近100期数据 -->
+	<select id="queryTwoDateMiss" resultType="com.bh.live.pojo.res.inform.HongKongMisssRes">
+		select number_seven_ball,expect,open_code,open_time from t_variety_current where variety_type='11' ORDER BY expect DESC LIMIT 0,${param}
+	</select>
+	<!-- 香港彩今年的游戏数据 -->
+	<select id="queryNowYearData" resultType="com.bh.live.pojo.res.inform.HongKongMisssRes">
+		select number_seven_ball,expect,open_time from t_variety_current where variety_type='11' and YEAR(open_time) =YEAR(now()) ORDER BY expect DESC
+	</select>
+	<!-- 香港彩历史同期 -->
+	<select id="queryHistoricalPeriod" resultType="com.bh.live.model.inform.StatHistoryDraw">
+		SELECT expect,open_time,open_code,variety_type,number_one_ball,number_two_ball,number_three_ball,number_four_ball,number_five_ball,number_six_ball,number_seven_ball,crown_sub,single_double,big_small
+			FROM t_variety_current where variety_type='11' and RIGHT(expect,3) = RIGHT(#{expect},3)
+			UNION
+			SELECT expect,open_time,open_code,variety_type,number_one_ball,number_two_ball,number_three_ball,number_four_ball,number_five_ball,number_six_ball,number_seven_ball,crown_sub,single_double,big_small
+			FROM t_variety_history where variety_type='11' and RIGHT(expect,3) = RIGHT(#{expect},3)
+			ORDER BY open_time DESC 
+	</select>
+</mapper>

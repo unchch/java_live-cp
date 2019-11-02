@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.system.AuthUserDao">
+
+    <select id="selectAuthUserPage"
+            parameterType="com.bh.live.pojo.req.cms.SearchParamsReq"
+            resultType="com.bh.live.model.cms.AuthUser">
+        SELECT * FROM sys_auth_user
+        WHERE 1 = 1
+        <if test="req.isAdmin == null">
+            AND uid != 'admin'
+        </if>
+        <if test="req.status != null">
+            AND status = #{req.status}
+        </if>
+        <if test="req.startTime != null and req.startTime != ''">
+            AND create_time <![CDATA[ >= ]]> #{req.startTime}
+        </if>
+        <if test="req.endTime != null and req.endTime != ''">
+            AND create_time <![CDATA[ <= ]]> #{req.endTime}
+        </if>
+        <if test="req.searchValue != null and req.searchValue != ''">
+            AND (uid like CONCAT('%', #{req.searchValue},'%')
+            OR username like CONCAT('%', #{req.searchValue},'%'))
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectUserRoles" parameterType="com.bh.live.model.cms.AuthUser" resultType="java.lang.String">
+		SELECT
+			GROUP_CONCAT(rol.CODE) AS Roles
+		FROM sys_auth_user usr
+		LEFT JOIN sys_auth_user_role uro ON usr.uid = uro.user_id
+		LEFT JOIN sys_auth_role rol ON uro.role_id = rol.id  and rol.`STATUS` = 1
+		WHERE usr.uid = #{uid,jdbcType=VARCHAR}
+	</select>
+
+    <delete id="deleteUserByIds">
+        delete from sys_auth_user where uid in
+        <foreach collection="ids" item="uid" open="(" separator="," close=")">
+            #{uid}
+        </foreach>
+    </delete>
+
+    <select id="selectUserRoleIds" parameterType="com.bh.live.model.cms.AuthUser" resultType="java.lang.String">
+		SELECT
+			GROUP_CONCAT(rol.id) AS roleIds
+		FROM sys_auth_user usr
+		LEFT JOIN sys_auth_user_role uro ON usr.uid = uro.user_id
+		LEFT JOIN sys_auth_role rol ON uro.role_id = rol.id
+		WHERE usr.uid = #{uid,jdbcType=VARCHAR}
+	</select>
+
+    <!-- 根据角色id查询用户列表 -->
+    <select id="selectUserListByRoleId"
+            resultType="com.bh.live.model.cms.AuthUser">
+        select
+        b.uid,
+        b.username,
+        '' as password,
+        '' as salt,
+        b.real_name,
+        b.avatar,
+        b.status,
+        b.create_time,
+        b.create_by,
+        b.update_by,
+        b.update_time,
+        b.remark
+        from sys_auth_user_role a
+        join sys_auth_user b on a.user_id = b.uid
+        WHERE a.role_id = #{roleId}
+        <if test="req.status != null">
+            AND b.status = #{req.status}
+        </if>
+        <if test="req.startTime != null  ">
+            AND b.create_time >= #{req.startTime}
+        </if>
+        <if test="req.endTime != null  ">
+            AND b.create_time &lt;= #{req.endTime}
+        </if>
+        <if test="req.searchValue != null and req.searchValue != '' ">
+            (
+            AND b.username like concat('%', #{req.searchValue}, '%')
+            OR b.real_name like concat('%', #{req.searchValue}, '%')
+            OR b.uid like concat('%', #{req.searchValue}, '%')
+            OR b.remark like concat('%', #{req.searchValue}, '%')
+            )
+        </if>
+    </select>
+
+    <select id="selectUserListExtendByRoleId"
+            resultType="com.bh.live.model.cms.AuthUser">
+        select
+        b.uid,
+        b.username,
+        '' as password,
+        '' as salt,
+        b.real_name,
+        b.avatar,
+        b.status,
+        b.create_time,
+        b.create_by,
+        b.update_by,
+        b.update_time,
+        b.remark
+        from sys_auth_user b
+        where not exists (select 1 from sys_auth_user_role c where b.uid = c.user_id and c.role_id = #{roleId})
+        and b.uid != 'admin'
+        <if test="req.status != null">
+            AND b.status = #{req.status}
+        </if>
+        <if test="req.startTime != null  ">
+            AND b.create_time >= #{req.startTime}
+        </if>
+        <if test="req.endTime != null  ">
+            AND b.create_time &lt;= #{req.endTime}
+        </if>
+        <if test="req.searchValue != null and req.searchValue != '' ">
+            (
+            AND b.username like concat('%', #{req.searchValue}, '%')
+            OR b.real_name like concat('%', #{req.searchValue}, '%')
+            OR b.uid like concat('%', #{req.searchValue}, '%')
+            OR b.remark like concat('%', #{req.searchValue}, '%')
+            )
+        </if>
+    </select>
+
+    <select id="selectAuthUserSimpleList" resultType="com.bh.live.pojo.res.cms.AuthUserSimpleRes">
+		select uid ,username, parent_user_id from sys_auth_user
+	</select>
+</mapper>

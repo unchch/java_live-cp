@@ -1,0 +1,44 @@
+server:
+  port: 9370
+  servlet:
+    context-path: /cms
+  connection-timeout: 60000MS
+
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: lotto-cms
+  http-client:
+    pool:
+      #连接池的最大连接数，0代表不限；如果取0，需要考虑连接泄露导致系统崩溃的后果
+      maxTotalConnect: 20
+      #每个路由的最大连接数,如果只调用一个地址,可以将其设置为最大连接数
+      maxConnectPerRoute: 40
+      # 指客户端和服务器建立连接的超时时间,ms , 最大约21秒,因为内部tcp在进行三次握手建立连接时,默认tcp超时时间是20秒
+      connectTimeout: 3000
+      # 指客户端从服务器读取数据包的间隔超时时间,不是总读取时间,也就是socket timeout,ms
+      readTimeout: 5000
+      # 从连接池获取连接的timeout,不宜过大,ms
+      connectionRequestTimout: 200
+      # 重试次数
+      retryTimes: 3
+      charset: UTF-8
+      # 长连接保持时间 单位s,不宜过长
+      keepAliveTime: 10
+      # 针对不同的网址,长连接保持的存活时间,单位s,如果是频繁而持续的请求,可以设置小一点,不建议设置过大,避免大量无用连接占用内存资源
+      keepAliveTargetHost:
+        www.baidu.com: 5
+
+#mybatis-plus配置，如果没有这个配置自定义的mapper.xml里面的查询方法会无法绑定到dao
+mybatis-plus:
+  mapper-locations: classpath*:com/bh/live/mapper/*/*/*.xml,com/bh/live/mapper/*/*.xml
+
+neo:
+  file-path: /usr/local/nginx/html/examples/gamebox/storage/
+  file-access-url: http://192.168.2.19:8080/epaxamples/gamebox/storage/
+  game-box-api: http://192.168.2.209:8081/api/
+  file-export-url: \Users\admin\Desktop\export
+
+google:
+  host: test

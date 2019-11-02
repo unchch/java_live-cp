@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.TradeUserOrderDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.trade.TradeUserOrder">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_code" property="orderCode"/>
+        <result column="serial_code" property="serialCode"/>
+        <result column="amount" property="amount"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_by" property="modifyBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, order_code, serial_code, amount, create_time, update_time, create_by, modify_by
+    </sql>
+
+
+    <select id="selectUserByOrder" resultType="com.bh.live.pojo.res.trade.TradeUserOrderRes"
+            parameterType="com.bh.live.pojo.req.trade.TradeUserOrderReq">
+        select a.id,user_id, order_code, serial_code, amount,order_no,
+        status,create_time, client_type, app_id, app_name, account_id,
+        c.nickname account_name, lot_issue_no,content, buy_time, lot_seed_no,
+        lot_seed_name, lot_play_no, lot_play_name, award_state,
+        award_number, buy_quantity, pay_amount, rebate,
+        rebate_amount, award_amount, profit_amount,
+        is_pay, profit_rate, win_quantity, prize_status, remark
+        from lotto_trade_user_order a
+        inner join lotto_order b on a.order_code=b.order_no
+        inner join lotto_live_user c on a.user_id = c.id
+        ${ew.customSqlSegment}
+        limit ${pageNum},${pageSize}
+    </select>
+
+    <select id="selectOrderCount" resultType="int">
+        select a.id,user_id, order_code, serial_code, amount,order_no,
+        status,create_time, client_type, app_id, app_name, account_id,
+        c.nickname account_name, lot_issue_no,content, buy_time, lot_seed_no,
+        lot_seed_name, lot_play_no, lot_play_name, award_state,
+        award_number, buy_quantity, pay_amount, rebate,
+        rebate_amount, award_amount, profit_amount,
+        is_pay, profit_rate, win_quantity, prize_status, remark
+        from lotto_trade_user_order a
+        inner join lotto_order b on a.order_code=b.order_no
+        inner join lotto_live_user c on a.user_id = c.id
+        ${ew.customSqlSegment}
+    </select>
+
+
+    <select id="selectAwardOrderRes" resultType="com.bh.live.pojo.res.trade.AwardOrderRes">
+        select a.order_no,a.account_id,b.user_id,b.serial_code,b.amount,a.status,a.award_state from lotto_order a
+        inner join lotto_trade_user_order b on a.order_no=b.order_code
+        where lot_issue_no=#{issue} and lot_seed_no=#{seedNo}
+    </select>
+</mapper>

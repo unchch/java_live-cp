@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.TodayNumDao">
+
+    <select id="queryTodayNum" parameterType="java.lang.Object" resultType="com.bh.live.model.inform.StatHistoryDraw">
+	    select
+        expect,
+        open_time,
+        open_code,
+        variety_type,
+        number_one_ball,
+        number_two_ball,
+        number_three_ball,
+        number_four_ball,
+        number_five_ball,
+        number_six_ball,
+        number_seven_ball,
+        number_eight_ball,
+        number_nine_ball,
+        number_ten_ball,
+        crown_sub,
+        single_double,
+        big_small,
+        first_dragon_tiger,
+        second_dragon_tiger,
+        third_dragon_tiger,
+        fourth_dragon_tiger,
+        fifth_dragon_tiger,
+        reserved_value
+	    from t_variety_current
+	     where  variety_type = #{varietyType}
+        <choose>
+            <when test="varietyType ==3 or varietyType ==7" >
+                AND substring(expect,1,8) = replace(CURDATE(),'-','') ORDER BY open_time DESC
+            </when>
+            <otherwise>
+               AND DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')  ORDER BY open_time DESC
+            </otherwise>
+        </choose>
+   </select>
+</mapper>

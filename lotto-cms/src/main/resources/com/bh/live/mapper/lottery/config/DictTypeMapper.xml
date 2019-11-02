@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.lottery.config.DictTypeDao">
+    <select id="selectByParam" parameterType="com.bh.live.pojo.req.lottery.config.DictTypeReq"
+            resultType="com.bh.live.pojo.res.lottery.config.DictTypeRes">
+        select dict_type_code,dict_type_name,is_disabled,create_time,update_time from lotto_dict_type where 1=1
+        <if test="param.dictTypeCode != null and param.dictTypeCode != ''">
+            and dict_type_code = ${param.dictTypeCode}
+        </if>
+        <if test="param.dictTypeName != null and param.dictTypeName != ''">
+            and dict_type_code in(select DISTINCT dict_type_code from lotto_dict_type where INSTR(dict_type_name,'${param.dictTypeName}') > 0)
+        </if>
+        order by dict_type_code
+    </select>
+
+    <insert id="saveDicyType" parameterType="com.bh.live.pojo.req.lottery.config.DictTypeReq"  useGeneratedKeys="true" keyProperty="dictTypeCode">
+        insert into lotto_dict_type(dict_type_name,is_disabled,create_time,create_by)
+         values(#{param.dictTypeName},#{param.isDisabled},#{param.createTime},#{param.createBy})
+    </insert>
+</mapper>

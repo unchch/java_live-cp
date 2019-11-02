@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.IssueDao">
+    <!-- 获取当前期和上、下一期的彩期 -->
+    <select id="selectIssue"
+            parameterType="java.lang.Integer"
+            resultType="com.bh.live.pojo.res.inform.IssueEntityRes">
+        SELECT
+            issue.*,
+            case
+                when issue.issue_no = tmp.pre_issue then 'last'
+                when issue.issue_no = tmp.issue_no then 'current'
+                when issue.pre_issue = tmp.issue_no then 'next'
+            end AS 'position',
+            NOW() AS 'systemDate',
+            seed.create_days AS totalIssue,
+            seed.create_days - IFNULL(issue.period_issue, 0) AS surplusIssue
+        FROM lotto_issue AS issue
+        LEFT JOIN lotto_seed AS seed ON seed.seed_no = issue.seed_no
+        LEFT JOIN (
+            SELECT seed_no, issue_no, pre_issue
+            FROM lotto_issue
+            WHERE start_time <![CDATA[ <= ]]> NOW()
+            AND closing_time <![CDATA[ > ]]> NOW()
+            <if test="seedNo != null">
+                AND seed_no = #{seedNo}
+            </if>
+        ) AS tmp ON tmp.seed_no = issue.seed_no
+        WHERE 1 = 1
+        <if test="seedNo != null">
+            AND issue.seed_no = #{seedNo}
+        </if>
+        AND (issue.issue_no = tmp.issue_no
+        OR issue.issue_no = tmp.pre_issue
+        OR issue.pre_issue = tmp.issue_no)
+        ORDER BY issue.seed_no, start_time ASC
+    </select>
+</mapper>

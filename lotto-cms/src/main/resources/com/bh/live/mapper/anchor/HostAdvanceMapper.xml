@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.anchor.HostAdvanceDao">
+
+    <select id="queryHostAdvances"
+            resultType="com.bh.live.pojo.res.anchor.HostAdvanceRes">
+        select lhu.username nickname,lhu.room_id,lhu.status hostStatus,lha.live_date,lha.start_time,lha.end_time,
+        lha.live_period,lha.seed_no,lha.live_date from lotto_host_advance lha
+        left join lotto_host_user lhu on lha.host_id=lhu.user_id where lha.is_usable=1 and
+        lha.is_using=1
+        <if test="type == 'oneSeed'">
+            and lha.seed_no=#{seedNo}
+        </if>
+        <if test="type == 'moreSeed'">
+            and lha.seed_no in
+            <foreach collection="seedNo" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by lha.start_time desc
+    </select>
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.StatNumberTrendDataDao">
+
+
+    <select id="queryStatNumberTrendData" resultType="com.bh.live.pojo.res.inform.NumberTrendDataRes">
+
+        SELECT right(expect,2) as period,${param.number} number
+        FROM t_variety_current
+        <if test="param.variety!=null">
+            where  variety_type = ${param.variety}
+        </if>
+        ORDER BY
+        expect DESC
+        LIMIT 40
+
+    </select>
+    <select id="queryCrownSubTrendData" resultType="com.bh.live.pojo.res.inform.NumberTrendDataRes">
+
+        SELECT
+            right(expect,2) as period,crown_sub  number
+        FROM
+            t_variety_current
+        <if test="variety!=null">
+            where  variety_type = ${variety}
+        </if>
+        ORDER BY
+        expect DESC
+        LIMIT 40
+    </select>
+
+    <select id="queryNumberTrendData" resultType="com.bh.live.pojo.res.inform.NumberTrendDataRes">
+        SELECT
+            right(expect,2) as period,
+            (
+            CASE
+                ${param.number}
+                WHEN number_one_ball THEN 1
+                WHEN number_two_ball THEN 2
+                WHEN number_three_ball THEN 3
+                WHEN number_four_ball THEN 4
+                WHEN number_five_ball THEN 5
+                WHEN number_six_ball THEN 6
+                WHEN number_seven_ball THEN 7
+                WHEN number_eight_ball THEN 8
+                WHEN number_nine_ball THEN 9
+                WHEN number_ten_ball THEN 10
+            END ) number
+        FROM
+            t_variety_current
+        <if test="param.variety!=null">
+            where  variety_type = ${param.variety}
+        </if>
+        ORDER BY
+        expect DESC
+        LIMIT 40
+    </select>
+</mapper>

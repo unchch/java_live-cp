@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.trade.TradeUserOrderDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.trade.TradeUserOrder">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_code" property="orderCode"/>
+        <result column="serial_code" property="serialCode"/>
+        <result column="amount" property="amount"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_by" property="modifyBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, order_code, serial_code, amount, create_time, update_time, create_by, modify_by
+    </sql>
+
+    <sql id="order_where">
+        <if test="param.isPay != null">
+            and is_pay = #{param.isPay}
+        </if>
+        <if test="param.accountId != null">
+            and account_id = #{param.accountId}
+        </if>
+        <if test="param.userId != null">
+            and user_id = #{param.userId}
+        </if>
+        <if test="param.serialCode != null and param.serialCode != '' ">
+            and serial_code = #{param.serialCode}
+        </if>
+        <if test="param.orderNo != null and param.orderNo != '' ">
+            and order_code = #{param.orderNo}
+        </if>
+        <if test="param.lotIssueNo != null and param.lotIssueNo != '' ">
+            and lot_issue_no = #{param.lotIssueNo}
+        </if>
+        <if test="param.seedNo != null and param.seedNo != '' ">
+            and lot_seed_no = #{param.seedNo}
+        </if>
+        <if test="param.accountName != null and param.accountName != '' ">
+            and nickname like concat(concat("%",#{param.accountName}),"%")
+        </if>
+        <if test="param.startTime != null">
+            and a.create_time >= #{param.startTime}
+        </if>
+        <if test="param.endTime != null">
+            and a.create_time &lt;= #{param.endTime}
+        </if>
+        <if test="param.awardState != null">
+            and award_state = #{param.awardState}
+        </if>
+    </sql>
+
+    <select id="selectUserByOrder" resultType="com.bh.live.model.trade.UserBuyOrder"
+            parameterType="com.bh.live.model.trade.vo.UserBuyOrderVO">
+        select a.id,user_id, order_code, serial_code, a.amount,order_no,
+        status,a.create_time, client_type, app_id, app_name, account_id,
+        c.nickname as username, lot_issue_no,content, buy_time, lot_seed_no,
+        lot_seed_name, lot_play_no, lot_play_name, award_state,d.nickname as accountName,
+        award_number, buy_quantity, pay_amount,
+        award_amount, profit_amount,
+        is_pay, profit_rate, win_quantity, prize_status, remark
+        from lotto_trade_user_order a
+        inner join lotto_order b on a.order_code=b.order_no
+        inner join lotto_live_user c on c.id=a.user_id
+        inner join lotto_live_user d on b.account_id=d.id
+        where 1=1
+        <include refid="order_where"/>
+        order by a.create_time desc
+    </select>
+</mapper>

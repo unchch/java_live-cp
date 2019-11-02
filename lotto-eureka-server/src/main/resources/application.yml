@@ -1,0 +1,9 @@
+
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: eureka-server
+
+server:
+  port: 9380

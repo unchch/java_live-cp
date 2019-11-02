@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.task.dao.advance.HostAdvanceDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.anchor.HostAdvance">
+        <id column="id" property="id" />
+        <result column="host_id" property="hostId" />
+        <result column="seed_no" property="seedNo" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="creat_time" property="creatTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_usable" property="isUsable" />
+        <result column="live_period" property="livePeriod" />
+        <result column="live_date" property="liveDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, host_id, seed_no, start_time, end_time, creat_time, update_time, is_usable, live_period, live_date
+    </sql>
+
+</mapper>

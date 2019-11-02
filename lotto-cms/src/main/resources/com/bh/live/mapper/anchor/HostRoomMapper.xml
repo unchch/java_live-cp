@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.anchor.HostRoomDao">
+
+    <select id="queryHostRoomList" parameterType="com.bh.live.pojo.req.anchor.LottoTypeReq"
+            resultType="com.bh.live.pojo.res.inform.LottoTypeRes">
+        SELECT r.status,u.host_lv,u.cover,r.nickname,r.line_persons,r.create_time,SUBSTR(r.end_time,12,5)endTime
+        ,r.open_time from lotto_host_room r LEFT JOIN lotto_host_user u
+        on u.host_id=r.host_id where r.lotto_name = #{req.seedName}
+        <choose>
+            <when test="req.sort == 'default'">
+                ORDER BY r.status desc ,r.line_persons desc
+            </when>
+            <when test="req.sort == 'number'">
+                ORDER BY r.line_persons desc
+            </when>
+            <when test="req.sort == 'level'">
+                ORDER BY r.line_persons desc
+            </when>
+            <when test="req.sort == 'time'">
+                ORDER BY r.open_time desc ,r.line_persons desc
+            </when>
+        </choose>
+    </select>
+
+    <select id="queryRoomLiveInfo" resultType="com.bh.live.pojo.res.anchor.RoomLiveRecord">
+        <!--##查询直播记录表-->
+        select * from (
+            select lr.id,lr.room_id,lr.`status`,lr.room_num,
+            lr.y_live_time,DATE_FORMAT(lr.open_time,'%Y-%m-%d %H:%i:%s') open_time,
+            DATE_FORMAT(lr.end_time,'%Y-%m-%d %H:%i:%s') end_time,null live_period,lr.time,lr.give_count,
+            lr.gift_num,lr.amount,hr.recomm_home_page,hr.sort,hr.nickname,ls.seed_name,null advanceId,
+            lr.user_id,lr.seed_no
+            from lotto_live_record lr
+            left join lotto_host_room hr on lr.user_id=hr.host_id and lr.room_id=hr.id
+            left join lotto_seed ls on ls.seed_no=lr.seed_no
+            where 1=1
+            <if test="param != null">
+                    <if test="param.roomId != null">and hr.id =#{param.roomId}</if>
+                    <if test="param.nickname != null and param.nickname != ''">
+                        and hr.nickname like concat('%',concat(#{param.nickname},'%'))
+                    </if>
+                    <if test="param.status != null">and lr.status = #{param.status}</if>
+                    <if test="param.seedNo != null">and lr.seed_no =#{param.seedNo}</if>
+                    <if test="(param.startTime != null and param.startTime != '') and (param.endTime != null and param.endTime != '')">
+                        and lr.end_time between #{param.startTime} and #{param.endTime}
+                    </if>
+                </if>
+                UNION
+            <!--##查询联合预告表-->
+            select null,r.id,0,null,a.live_date,DATE_FORMAT(a.start_time,'%H:%i:%s') start_time,
+                DATE_FORMAT(a.end_time,'%H:%i:%s') endTime,a.live_period,
+                null,null,null,null,r.recomm_home_page,r.sort,r.nickname,s.seed_name,a.id,
+                a.host_id,a.seed_no
+                from lotto_host_advance a
+                left join lotto_host_room r on r.host_id=a.host_id
+                left join lotto_seed s on s.seed_no=a.seed_no
+                where a.id not in(select advance_id from lotto_live_record)
+                and a.is_usable=1 and a.is_using=1
+                <if test="param != null">
+                    <if test="param.roomId != null">and r.id =#{param.roomId}</if>
+                    <if test="param.nickname != null and param.nickname != ''">
+                        and r.nickname like concat('%',concat(#{param.nickname},'%'))
+                    </if>
+                    <if test="param.status != null">
+                        <if test="param.status==0">
+                            and 1=1 <!--##如果查询状态未未开播，就返回所有未开播的预告-->
+                        </if>
+                        <if test="param.status==1 or param.status==2">
+                            and 1=0
+                        </if>
+                    </if>
+                    <if test="param.seedNo != null">and a.seed_no =#{param.seedNo}</if>
+                    <if test="(param.startTime != null and param.startTime != '') and (param.endTime != null and param.endTime != '')">
+                        and 1=0 <!--##如果查开播结束时间，就不查询预告-->
+                    </if>
+                </if>
+          ) a
+    </select>
+</mapper>

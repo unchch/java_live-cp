@@ -1,0 +1,17 @@
+package com.bh.live.trade.dao;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.bh.live.model.lottery.config.OrderUserProfitConfg;
+
+
+/**
+ * <p>
+ * 用户类别所设置价格等级 Mapper 接口
+ * </p>
+ *
+ * @author lgs
+ * @since 2019-07-25
+ */
+public interface OrderUserProfitConfgDao extends BaseMapper<OrderUserProfitConfg> {
+
+}

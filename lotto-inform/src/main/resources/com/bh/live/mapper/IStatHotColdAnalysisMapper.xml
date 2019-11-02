@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.StatHotColdAnalysisDao">
+
+
+    <select id="queryHotColdAnalysis" resultType="com.bh.live.pojo.res.inform.NumberTrendDataRes">
+
+        	SELECT
+                COUNT(stat.${number})  number,stat.${number} as period
+            FROM
+                (SELECT ${number} FROM t_variety_current
+                <if test="variety!=null">
+                    where  variety_type = ${variety}
+                </if>
+                ORDER BY expect DESC LIMIT 20) as stat
+            GROUP BY
+                stat.${number}
+
+    </select>
+</mapper>

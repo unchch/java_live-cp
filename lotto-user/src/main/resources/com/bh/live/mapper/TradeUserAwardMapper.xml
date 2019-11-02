@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.TradeUserAwardDao">
+
+
+    <select id="queryTradePage" resultType="com.bh.live.pojo.res.trade.TradeUserAwardRes">
+        SELECT
+            u.id userId,
+            u.nickname userName,
+            tvu.id tvUserId,
+            tvu.nickname tvUserName,
+            gift.id giftId,
+            gift.gift_name giftName,
+            gift.icon giftImage,
+            trade.create_time,
+            trade.gift_num
+        FROM
+          lotto_trade_user_award as trade,
+            lotto_live_user AS u,
+            lotto_live_user AS tvu,
+            lotto_gift as gift
+        where
+            trade.user_id=u.id
+            and trade.tv_user_id=tvu.id
+            and trade.gift_id=gift.id
+            AND trade.room_id= #{roomId}
+            AND	trade.create_time BETWEEN #{startTime} AND #{endTime}
+        order by trade.create_time desc
+    </select>
+
+    <select id="queryRanking" resultType="com.bh.live.pojo.res.trade.UserAwardtRankingRes">
+        SELECT
+            user_id,
+            sum( amount ) amount,
+            u.nickname,
+            u.image_url
+        FROM
+            lotto_trade_user_award,lotto_live_user  u
+        WHERE
+            user_id=u.id
+            AND	create_time >= #{startTime}
+            AND room_id = #{roomId}
+        GROUP BY
+            user_id
+        ORDER BY
+            amount DESC
+    </select>
+
+    <select id="getGift" resultType="com.bh.live.pojo.res.live.ChatGift">
+        SELECT * FROM lotto_gift where id = #{giftId}
+    </select>
+</mapper>

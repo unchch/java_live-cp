@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.task.dao.ranking.RankingTaskDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.bh.live.model.rankingList.RankingList">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="popularity_value" property="popularityValue" />
+		<result column="treasure_value" property="treasureValue" />
+		<result column="winging_value" property="wingingValue" />
+		<result column="winrate_value" property="winrateValue" />
+		<result column="profitrate_value" property="profitrateValue" />
+		<result column="rank_period" property="rankPeriod" />
+		<result column="is_usable" property="isUsable" />
+		<result column="update_time" property="updateTime" />
+		<result column="creat_time" property="creatTime" />
+		<result column="number_of" property="numberOf" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, user_id, popularity_value, treasure_value,
+		winging_value,
+		winrate_value, profitrate_value, rank_period, is_usable,
+		update_time,
+		creat_time
+	</sql>
+
+	<!-- 查询全部用户 -->
+	<select id="queryAllLiveUser"
+		resultType="com.bh.live.model.user.LiveUser">
+		SELECT
+		id,
+		is_usable,
+		is_expert,
+		is_anchor
+		FROM lotto_live_user
+	</select>
+
+	<!-- 查询人气和财富 -->
+	<select id="queryPopularityAndTreasure"
+		resultMap="BaseResultMap">
+		SELECT
+		lttu.id AS user_id,
+		IFNULL(lhu.hot_val, 0) AS
+		popularity_value,
+		IFNULL(COUNT(lttu.trans_amount), 0) AS treasure_value
+		FROM
+		lotto_trade_trans_user lttu
+		LEFT JOIN lotto_live_user llu
+		ON
+		lttu.user_id = llu.id
+		LEFT JOIN
+		lotto_host_user lhu
+		ON llu.id =
+		lhu.user_id
+		WHERE lttu.trans_type = #{transType}
+		AND lttu.create_time
+		BETWEEN #{startTime} AND #{endTime}
+		AND lttu.id=#{userId}
+	</select>
+
+	<!-- 查询盈利和总赢率 -->
+	<select id="queryWinrateAndProfitrate" resultMap="BaseResultMap">
+		SELECT
+		llu.id AS
+		user_id,
+		IFNULL( (SELECT COUNT(account_id)
+		FROM
+		lotto_order
+		WHERE
+		award_state = '1') / COUNT(lo.account_id),
+		0
+		) AS winrate_value,
+		IFNULL(SUM(lo.profit_rate), 0) AS profitrate_value
+		FROM
+		lotto_order lo
+		LEFT JOIN lotto_live_user llu
+		ON
+		lo.account_id = llu.id
+		WHERE lo.create_time BETWEEN #{startTime} AND
+		#{endTime}
+		AND
+		llu.id=#{userId}
+	</select>
+
+	<select id="queryContinuous" resultType="java.util.Map">
+		SELECT
+		account_id,
+		award_state,
+		create_time
+		FROM
+		lotto_order
+		WHERE
+		create_time
+		BETWEEN
+		#{startTime} AND #{endTime}
+		AND
+		account_id=#{userId}
+		ORDER BY
+		create_time
+		DESC
+	</select>
+
+	<insert id="updateOrInsertRank" parameterType="java.util.List">
+		INSERT INTO lotto_ranking_list
+		(user_id,
+		user_type,
+		popularity_value,
+		treasure_value,
+		winging_value,
+		winrate_value,
+		profitrate_value,
+		rank_period,
+		is_usable)
+		VALUES
+		<foreach collection="ranklist" item="item" index="index"
+			separator=",">
+			(#{item.userId},
+			#{item.userType},
+			#{item.popularityValue},
+			#{item.treasureValue},
+			#{item.wingingValue},
+			#{item.winrateValue},
+			#{item.profitrateValue},
+			#{item.rankPeriod},
+			#{item.isUsable})
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+		popularity_value = VALUES(popularity_value),
+		treasure_value = VALUES(treasure_value),
+		winging_value = VALUES(winging_value),
+		winrate_value = VALUES(winrate_value),
+		profitrate_value = VALUES(profitrate_value),
+		is_usable = VALUES(is_usable)
+	</insert>
+</mapper>

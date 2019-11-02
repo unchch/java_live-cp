@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.TradeTransUserDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.bh.live.model.trade.TradeTransUser">
+		<id column="id" property="id" />
+		<result column="trans_code" property="transCode" />
+		<result column="user_id" property="userId" />
+		<result column="order_code" property="orderCode" />
+		<result column="trans_type" property="transType" />
+		<result column="trans_status" property="transStatus" />
+		<result column="channel_id" property="channelId" />
+		<result column="trans_amount" property="transAmount" />
+		<result column="cash_amount" property="cashAmount" />
+		<result column="total_cash_balance" property="totalCashBalance" />
+		<result column="award_flag" property="awardFlag" />
+		<result column="in_out" property="inOut" />
+		<result column="remark" property="remark" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, trans_code, user_id, order_code, trans_type,
+		trans_status,
+		channel_id, trans_amount, cash_amount,
+		total_cash_balance, award_flag,
+		in_out, remark, create_time,
+		update_time
+	</sql>
+
+	<select id="queryOrderByOrderno"
+		resultType="com.bh.live.model.trade.Order">
+		SELECT
+		t2.nickname account_name,
+		lot_seed_name,
+		lot_issue_no,
+		content,
+		award_number
+		FROM lotto_order t1
+		INNER JOIN lotto_live_user t2 ON t1.account_id = t2.id
+		WHERE t1.order_no=#{orderno}
+	</select>
+
+	<select id="queryGif" resultType="java.util.Map" >
+		SELECT 
+		 t2.nickname AS createBy,
+		 t3.username AS TargetBy,
+		 t4.gift_name,
+		 t1.amount,
+		 t1.gift_num
+		FROM
+		  lotto_trade_user_award t1 
+		  INNER JOIN lotto_live_user t2 
+		    ON t1.user_id = t2.id 
+		  INNER JOIN lotto_host_user t3 
+		    ON t1.tv_user_id = t3.user_id
+		  INNER JOIN lotto_gift t4
+		    ON t1.gift_id = t4.id
+		WHERE t1.trans_code=#{orderno}
+	</select>
+
+	<select id="queryTradeAllTransUser" resultType="com.bh.live.pojo.res.trade.TradeAllTransUser" >
+		SELECT
+		  t1.*,
+		  t2.gift_num,
+		  t4.gift_name,
+		  t3.nickname
+		FROM
+		  lotto_trade_trans_user t1
+		  LEFT JOIN lotto_trade_user_award t2
+			ON t2.trans_code = t1.trans_code
+		  LEFT JOIN lotto_gift t4
+			ON t4.id = t2.gift_id
+		  LEFT JOIN lotto_live_user t3
+			ON t3.id = t2.tv_user_id
+		WHERE t1.user_id = #{req.userId} AND t1.trans_type = 2
+		ORDER BY t1.create_time DESC
+		/*LIMIT ${req.pageNum},${req.pageSize}*/
+	</select>
+
+	<select id="queryTradeAllTransUserCount" resultType="integer" >
+		SELECT
+		  count(t1.id)
+		FROM
+		  lotto_trade_trans_user t1
+		  LEFT JOIN lotto_trade_user_award t2
+			ON t2.trans_code = t1.order_code
+		  LEFT JOIN lotto_gift t4
+			ON t4.id = t2.gift_id
+		  LEFT JOIN lotto_live_user t3
+			ON t3.id = t2.tv_user_id AND t1.trans_type = 2
+		WHERE t1.user_id = #{req.userId}
+	</select>
+
+</mapper>

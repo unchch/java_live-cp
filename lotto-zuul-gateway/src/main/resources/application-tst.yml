@@ -1,0 +1,77 @@
+spring:
+  #mq配置
+  rabbitmq:
+    addresses: tst-mq1.yzkj.net:5672,tst-mq1.yzkj.net:15672,tst-mq1.yzkj.net:25672
+    username: rbmq
+    password: 123456
+  #redis配置
+  redis:
+    host: tst-redis1.yzkj.net
+    port: 6379
+    password: 123456
+    database: 0
+    jedis:
+      pool:
+        max-active: 40
+        max-idle: 20
+        min-idle: 2
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://tst-livebase-eureka.yzkj.net/eureka/
+    healthcheck:
+      enabled: true  # 开启健康检查（依赖spring-boot-starter-actuator）
+  register-with-eureka: true #使用Eureka注册服务
+  fetch-registry: true #在本地缓存注册表
+  registry-fetch-interval-seconds: 5 #eureka client间隔多久去拉取服务注册信息，默认为30秒
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+
+#ribbon超时配置
+#Zuul 的路由主要有 Eureka 和 Ribbon 两种方式，由于我一直使用的都是 Ribbon，所以简单介绍下 Ribbon 支持哪些容错配置。
+#重试的场景分为三种：
+#okToRetryOnConnectErrors：只重试网络错误
+#okToRetryOnAllErrors：重试所有错误
+#OkToRetryOnAllOperations：重试所有操作（这里不太理解，猜测是 GET/POST 等请求都会重试）
+#重试的次数有两种：
+#MaxAutoRetries：每个节点的最大重试次数
+#MaxAutoRetriesNextServer：更换节点重试的最大次数
+ribbon:
+  ConnectTimeout: 10000 #连接超时
+  ReadTimeout: 60000 #HTTP客户端读取超时
+  MaxAutoRetries: 0 #在同一服务器上重试的最大次数（不包括第一次尝试）
+  MaxAutoRetriesNextServer: 1 #重试下一个服务器的最大数量（不包括第一个服务器）
+  #eureka:
+  #enabled: false # false表示 明确禁用在Ribbon中使用Eureka 实现支持。
+
+
+#熔断超时配置
+#配置断路器的超时时间需要考虑 riboon的超时控制 ，断路器的超时控制需要大于 riboon 超时配置 ， ribbonTimeout = (ribbonReadTimeout + ribbonConnectTimeout) * (maxAutoRetries + 1) * (maxAutoRetriesNextServer + 1);
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 150000
+
+feign:
+  hystrix:
+    enabled: false #禁用feign的断路器功能
+
+# 日志配置
+logging:
+  level:
+    com.bh.live: debug
+    org.springframework: warn
+
+# 前端用户加密生成token
+access:
+  jwt:
+    token:
+      secret: dfiads@nn*803jk(kjdf)!
+      issuer: dewq[!dDDGSaHdf@dUool!1f25+d
+      expire-Time: 1800 #30分钟
+      week-Expire-Time: 604800 #一周

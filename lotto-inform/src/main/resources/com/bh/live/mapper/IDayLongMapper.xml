@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.DayLongDao">
+    <!-- 每日长龙-->
+    <!-- <select id="getStatDayLongList" parameterType="java.util.Map" resultType="com.bh.live.pojo.res.inform.DragonRes">
+        SELECT
+        DATE_FORMAT(open_date,'%Y-%m-%d') as openDate,
+        rank_name as rankName,
+        ld_period as ldPeriod,
+        ld_type as ldType,
+        frequency as frequency
+        FROM t_long_dragon
+        where 1=1 and DATE_SUB(CURDATE(), INTERVAL 20 DAY) &lt;= date(open_date)
+        <if test="param.rankName!=null and param.rankName!=''">
+            and rank_name=${param.rankName}
+        </if>
+        <if test="param.ldType!=null and param.ldType!=''">
+            and ld_type=#{param.ldType}
+        </if>
+        彩种判断
+        <if test="param.varietyType!=null and param.varietyType!=''">
+            and variety_type=#{param.varietyType}
+        </if>
+        order by open_date desc
+        <if test="param.pageNum!=null and param.pageNum!=''">
+          limit #{param.pageNum},
+         </if>
+         <if test="param.pageSize!=null and param.pageSize!=''">
+             #{param.pageSize}
+         </if>
+    </select> -->
+
+    <!-- 获取条件下的最大期数-->
+    <select id="getMaxLdPeriod" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select max(ld_period) as maxLdPeriod from t_long_dragon
+        WHERE 1=1 and DATE_SUB(CURDATE(), INTERVAL 20 DAY) &lt;= date(open_date)
+        <if test="param.rankName!=null and param.rankName!=''">
+            and rank_name=${param.rankName}
+        </if>
+        <if test="param.ldType!=null and param.ldType!=''">
+            and ld_type=#{param.ldType}
+        </if>
+        <!-- 彩种判断 -->
+        <if test="param.varietyType!=null and param.varietyType!=''">
+            and variety_type=#{param.varietyType}
+        </if>
+        order by open_date desc
+        <!-- <if test="param.pageNum!=null and param.pageNum!=''">
+       limit #{param.pageNum},
+      </if>
+      <if test="param.pageSize!=null and param.pageSize!=''">
+          #{param.pageSize}
+      </if>-->
+    </select>
+        <!--sql注入（勿删）-->
+    <select id="getStatDayLongList" resultType="com.bh.live.model.inform.Omission">
+        ${sql}
+    </select>
+</mapper> 

@@ -1,0 +1,11 @@
+eureka:
+  client:
+    #此项目不作为客户端注册
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      #开启权限验证后Eureka地址为 用户名：密码@地址：端口号，如未开启权限验证则直接使用 地址：端口号
+      defaultZone: http://localhost:${server.port}/eureka
+  server:
+    enable-self-preservation: false #关闭自我保护
+    eviction-interval-timer-in-ms: 3000 #清理间隔（单位毫秒，默认是60*1000）

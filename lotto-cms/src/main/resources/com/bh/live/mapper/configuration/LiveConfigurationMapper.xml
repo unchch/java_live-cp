@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.bh.live.dao.configuration.LiveConfigurationDao">
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.bh.live.model.configuration.LiveConfiguration">
+		<id column="id" property="id" />
+		<result column="type_name" property="typeName" />
+		<result column="type_value" property="typeValue" />
+		<result column="config_name" property="configName" />
+		<result column="config_value" property="configValue" />
+		<result column="config_describe" property="configDescribe" />
+		<result column="is_usable" property="isUsable" />
+		<result column="extend_name" property="extendName" />
+		<result column="extend_value" property="extendValue" />
+		<result column="extend_describe" property="extendDescribe" />
+		<result column="sort_value" property="sortValue" />
+		<result column="creat_time" property="creatTime" />
+		<result column="creat_by" property="creatBy" />
+		<result column="update_time" property="updateTime" />
+		<result column="update_by" property="updateBy" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, type_name, type_value, config_name, config_value,
+		config_describe,
+		is_usable, extend_name, extend_value, extend_describe,
+		sort_value,
+		creat_time, creat_by, update_time, update_by
+	</sql>
+
+	<!-- 查询全局设置参数类型 -->
+	<select id="queryConfigTypeForKeyAndValue" resultMap="BaseResultMap" >
+		SELECT type_value,type_name FROM lotto_live_configuration 
+		WHERE  is_usable=1 
+		GROUP BY type_value,type_name
+	</select>
+
+</mapper>

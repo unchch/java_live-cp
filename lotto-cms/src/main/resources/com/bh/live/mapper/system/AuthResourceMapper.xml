@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.system.AuthResourceDao">
+
+    <!-- 获取所有权限所赋予的角色 -->
+    <select id="selectRoleRules" resultType="com.bh.live.shiro.dto.RolePermRule">
+		select
+			CONCAT(re.path, "==",UCASE(re.method)) as path,
+			GROUP_CONCAT(rol.code ORDER BY re.path) as needRoles
+		from sys_auth_resource re
+		inner JOIN sys_auth_role_resource ro on re.id = ro.resource_id
+		inner JOIN sys_auth_role rol on ro.role_id = rol.ID
+		where re.type in (2, 3)
+		and re.status = 0
+		GROUP BY re.path,re.id
+	</select>
+
+    <select id="selectAuthorityMenusByUid"
+            parameterType="com.bh.live.model.cms.AuthUser"
+            resultType="com.bh.live.model.cms.AuthResource">
+		select distinct d.* from sys_auth_user a
+							join sys_auth_user_role b on a.uid = b.user_id
+							join sys_auth_role r on r.id = b.role_id
+							join sys_auth_role_resource c on r.id = c.role_id
+							join sys_auth_resource d on c.resource_id = d.id
+		where a.uid = #{uid,jdbcType=VARCHAR} and (d.type = 1 or d.type = 0) and r.status = 1 and d.status = 0
+	</select>
+
+    <select id="selectAuthorityApisByUid"
+            parameterType="com.bh.live.model.cms.AuthUser"
+            resultType="com.bh.live.model.cms.AuthResource">
+		select distinct d.* from sys_auth_user a
+							join sys_auth_user_role b on a.uid = b.user_id
+							join sys_auth_role r on r.id = b.role_id
+							join sys_auth_role_resource c on r.id = c.role_id
+							join sys_auth_resource d on c.resource_id = d.id
+		where a.uid = #{uid,jdbcType=VARCHAR} and d.type in (2, 3) and r.status = 1 and d.status = 0
+	</select>
+
+    <select id="selectApisNotParentByRoleId"
+            parameterType="com.bh.live.model.cms.AuthRoleResource"
+            resultType="com.bh.live.model.cms.AuthResource">
+		select distinct a.*, if(t.id is null, 1, 0) AS is_last_level
+		from sys_auth_resource a
+		join sys_auth_role_resource b on a.id = b.resource_id
+		LEFT JOIN (
+			select parent_id AS id from sys_auth_resource GROUP BY parent_id
+		) t ON t.id = a.id
+		where b.role_id = #{roleId,jdbcType=INTEGER} and a.type in (2, 3) and a.status = 0
+	</select>
+
+</mapper>

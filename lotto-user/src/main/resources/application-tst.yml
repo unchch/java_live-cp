@@ -1,0 +1,105 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://tst-db1.yzkj.net:3306/db_live?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: root
+    password: 123456
+    druid:
+      #初始化连接数
+      initial-size: 1
+      #最小空闲连接数
+      min-idle: 10
+      #最大连接数
+      max-active: 100
+      #获取连接等待超时的时间
+      max-wait: 60000
+      filters: stat,config
+      stat-view-servlet:
+        #是否开启监控
+        enabled: true
+        #监控访问路径
+        url-pattern: /druid/*
+        #允许清空统计数据
+        reset-stat-enable: true
+        login-username: druid
+        login-password: druid
+        allow:
+  #mq配置
+  rabbitmq:
+    addresses: tst-mq1.yzkj.net:5672,tst-mq1.yzkj.net:15672,tst-mq1.yzkj.net:25672
+    username: rbmq
+    password: 123456
+  #redis配置
+  redis:
+    host: tst-redis1.yzkj.net
+    port: 6379
+    password: 123456
+    database: 0
+    timeout: 0
+    jedis:
+      pool:
+        max-active: 20 # 连接池最大连接数（使用负值表示没有限制）
+        max-idle: 10 # 连接池中的最大空闲连接
+        min-idle: 2 # 连接池中的最小空闲连接
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+
+  servlet: # 此版本的节点为servlet，不是http 注意一下
+    multipart:
+      enabled: true # 启用
+      max-file-size: 10MB # 设置单个文件的最大长度
+      max-request-size: 10MB # 设置最大的请求文件的大小
+      file-size-threshold: 1MB # 当上传文件达到1MB的时候进行磁盘写入
+      location: /
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: false  #不开启重试机制 默认为true 是开启
+#注册服务到注册中心
+eureka:
+  instance:
+    prefer-ip-address: true #注册服务的ip
+    lease-renewal-interval-in-seconds: 5      # 租期更新时间间隔（默认30秒）
+    lease-expiration-duration-in-seconds : 10  # 租期到期时间（默认90秒）不怕出错的话，时间可以更短
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+  client:
+    register-with-eureka: true #使用Eureka注册服务
+    fetch-registry: true #在本地缓存注册表
+    service-url:
+      defaultZone: http://tst-livebase-eureka.yzkj.net/eureka #Eureka服务位置
+    registry-fetch-interval-seconds: 5 #eureka client间隔多久去拉取服务注册信息，默认为30秒
+    healthcheck:
+      enabled: true  # 开启健康检查（依赖spring-boot-starter-actuator）
+# 日志配置
+logging:
+  level:
+    com.bh.live: debug
+    org.springframework: warn
+
+# 前端用户加密生成token
+access:
+  jwt:
+    token:
+      secret: dfiads@nn*803jk(kjdf)!
+      issuer: dewq[!dDDGSaHdf@dUool!1f25+d
+      expire-Time: 1800 #30分钟
+      week-Expire-Time: 604800 #一周
+
+aliyun:
+  oss:
+    bucketName: live-prd
+    endpoint: http://oss-cn-hongkong.aliyuncs.com
+    accessKeyId: LTAI1v9Fxyy1qIht
+    accessKeySecret: aVFTHSbQLrQPVihWLHy4VGBboOY6rz
+
+#文件上传根目录，按照环境值改 dev/,prd/,tst/,uat
+filedir: "tst/"
+
+#阿里云自有域名，上传成功后需要把bucketName改成自有域名
+ownName: "http://live-oss.qukanhai.cn"
+
+
+

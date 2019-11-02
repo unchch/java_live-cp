@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.trade.OrderDao">
+
+    <select id="selectOrder" resultType="com.bh.live.model.trade.Order">
+        select a.*,(select count(1) from lotto_trade_user_order where order_code=order_no) as total,b.nickname as
+        account_name
+        from lotto_order a inner join lotto_live_user b on a.account_id=b.id
+        <include refid="order_where"/>
+        order by a.create_time desc
+    </select>
+
+    <sql id="order_where">
+        <if test="param.categoryNo != null">
+            and lot_seed_no in (select seed_no from lotto_seed where category_no=#{param.categoryNo})
+        </if>
+        <if test="param.isPay != null">
+            and is_pay = #{param.isPay}
+        </if>
+        <if test="param.accountId != null">
+            and account_id = #{param.accountId}
+        </if>
+        <if test="param.orderNo != null and param.orderNo != '' ">
+            and order_no = #{param.orderNo}
+        </if>
+        <if test="param.lotIssueNo != null and param.lotIssueNo != '' ">
+            and lot_issue_no = #{param.lotIssueNo}
+        </if>
+        <if test="param.seedNo != null and param.seedNo != '' ">
+            and lot_seed_no = #{param.seedNo}
+        </if>
+        <if test="param.accountName != null and param.accountName != '' ">
+            and b.nickname like concat(concat("%",#{param.accountName}),"%")
+        </if>
+        <if test="param.startTime != null">
+            and a.create_time >= #{param.startTime}
+        </if>
+        <if test="param.endTime != null">
+            and a.create_time &lt;= #{param.endTime}
+        </if>
+        <if test="param.awardState != null">
+            and award_state = #{param.awardState}
+        </if>
+        <if test="param.mobile != null">
+            and b.mobile = #{param.mobile}
+        </if>
+    </sql>
+
+    <select id="selectOrderCount" resultType="com.bh.live.model.trade.OrderTotal"
+            parameterType="com.bh.live.model.trade.vo.OrderVO">
+        select lot_seed_no,lot_seed_name,count(1) total,ifnull(sum(pay_amount),0) pay_amount
+        from lotto_order
+        where 1=1
+        <if test="seedNo != null">
+            and lot_seed_no = #{seedNo}
+        </if>
+        <if test="startTime != null">
+            and create_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and create_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <select id="selectFirstUserBuy" resultType="int" parameterType="com.bh.live.model.trade.vo.OrderVO">
+        select ifnull(count(1),0) from lotto_trade_user_order a
+        inner join lotto_order b on a.order_code=b.order_no
+        where 1=1
+        <if test="seedNo != null">
+            and lot_seed_no = #{seedNo}
+        </if>
+        <if test="startTime != null">
+            and a.create_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt;= #{endTime}
+        </if>
+        HAVING count(1)=1
+    </select>
+
+    <select id="selectRepeatUserBuy" resultType="int" parameterType="com.bh.live.model.trade.vo.OrderVO">
+        select ifnull(count(1),0) from lotto_trade_user_order a
+        inner join lotto_order b on a.order_code=b.order_no
+        where 1=1
+        <if test="seedNo != null">
+            and lot_seed_no = #{seedNo}
+        </if>
+        <if test="startTime != null">
+            and a.create_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt;= #{endTime}
+        </if>
+        HAVING count(1)>1
+    </select>
+
+    <select id="selectUserBuyCount" resultType="int" parameterType="com.bh.live.model.trade.vo.OrderVO">
+        select count(total) from (select b.account_id,ifnull(count(1),0) as total from lotto_trade_user_order a
+        inner join lotto_order b on a.order_code=b.order_no
+        where 1=1
+        <if test="seedNo != null">
+            and lot_seed_no = #{seedNo}
+        </if>
+        <if test="startTime != null">
+            and a.create_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt;= #{endTime}
+        </if>
+        group by b.account_id
+        HAVING count(1)>1) c
+    </select>
+</mapper>

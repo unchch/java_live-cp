@@ -1,0 +1,19 @@
+server:
+  port: 9330
+  connection-timeout: 60000MS
+  servlet:
+    context-path: /pay
+
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: lotto-pay
+
+#mybatis-plus配置，如果没有这个配置自定义的mapper.xml里面的查询方法会无法绑定到dao
+mybatis-plus:
+  mapper-locations: classpath*:com/bh/live/mapper/*/*.xml
+
+
+
+

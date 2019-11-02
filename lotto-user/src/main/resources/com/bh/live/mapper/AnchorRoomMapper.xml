@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.AnchorRoomDao">
+
+
+    <select id="getAnchorRecommend" resultType="com.bh.live.pojo.res.anchor.AnchorRoomInfoRes">
+      SELECT
+            u.user_id,
+            u.username,
+            u.room_id,
+            u.cover,
+            u.status,
+            u.icon as image_url,
+            <choose>
+                <when test="userId!=null">
+                    (SELECT count(1) FROM lotto_attention WHERE target_id =u.user_id AND user_id = #{userId}  and is_attent =1 ) as is_attent,
+                </when>
+                <otherwise>
+                    0 as is_attent,
+                </otherwise>
+            </choose>
+            ( SELECT count( 1 ) FROM lotto_attention WHERE target_id = u.user_id AND is_attent = 1 ) attent_count
+        FROM
+            lotto_host_user u
+        WHERE find_in_set(#{seedNo},adept_lottery)
+        ORDER BY
+            field( STATUS, 2, 1, 0 ) ASC,
+            attent_count DESC
+        limit 15
+    </select>
+    <select id="getAttentionAnchor" resultType="com.bh.live.pojo.res.anchor.AnchorRoomInfoRes">
+          SELECT
+            u.user_id,
+            u.username,
+            u.room_id,
+            u.cover,
+            u.status,
+        <choose>
+            <when test="userId!=null">
+                (SELECT count(1) FROM lotto_attention WHERE target_id =u.user_id AND user_id = #{userId}  and is_attent =1 ) as is_attent
+            </when>
+            <otherwise>
+                0 as is_attent
+            </otherwise>
+        </choose>
+        FROM
+            lotto_host_user u
+        WHERE
+            u.user_id IN ( SELECT target_id FROM lotto_attention WHERE is_attent = 1 AND user_id = #{userId} )
+    </select>
+    <select id="getLottoSeed" resultType="com.bh.live.pojo.res.lottery.HistoryLotteryRes">
+          SELECT issue_no,result,open_time,
+                  (	SELECT  seed_name FROM lotto_seed WHERE seed_no = 402) as seedName
+          FROM  lotto_issue
+          WHERE seed_no = #{seedNo}
+                AND DATE_FORMAT(open_time,'%Y-%m-%d') = date_format('2019-08-08', '%Y-%m-%d')
+          ORDER BY open_time  desc LIMIT 10
+    </select>
+    <select id="getGiftList" resultType="com.bh.live.pojo.res.anchor.GiftInfoRes">
+        SELECT
+            id,
+            gift_name,
+            amount,
+            anchor_xp,
+            user_xp,
+            gift_desc,
+            image,
+            gif,
+            full_gif,
+            icon,
+            pc_image,
+            pc_gif,
+            pc_full_gif,
+            pc_icon,
+            groups
+        FROM lotto_gift
+        WHERE
+            is_delete = 0 AND STATUS = 1
+        ORDER BY sort
+    </select>
+    <select id="getHostUserInfo" resultType="com.bh.live.pojo.res.anchor.AnchorRes">
+        SELECT
+            u.id user_id,
+            u.image_url,
+            u.nickname,
+            h.room_id,
+            h.media_url,
+            h.status,
+            r.notice,
+            r.is_usable,
+            r.secret_key,
+            (SELECT  seed_name FROM lotto_seed WHERE seed_no = #{seedNo}) as seed_name,
+            <choose>
+                <when test="userId!=null">
+                    (SELECT count(1) FROM lotto_attention WHERE target_id =u.id AND user_id = #{userId}  and is_attent =1 ) as is_attent,
+                </when>
+                <otherwise>
+                    0 as is_attent,
+                </otherwise>
+            </choose>
+            ( SELECT count( 1 ) FROM lotto_attention WHERE target_id = u.id ) AS attent_count ,
+            (SELECT l.ord_num
+            FROM (
+                SELECT r.user_id,(@i := @i + 1) as ord_num FROM lotto_ranking_list  r ,(select @i := 0) b
+                WHERE r.rank_period =3
+            ORDER BY r.popularity_value desc LIMIT 10
+            ) as l WHERE l.user_id = u.id) as popularity_value,
+            (SELECT l.ord_num
+            FROM (
+                SELECT r.user_id,(@j := @j + 1) as ord_num FROM lotto_ranking_list  r ,(select @j := 0) b
+                WHERE r.rank_period =3
+            ORDER BY r.treasure_value desc LIMIT 10
+            ) as l WHERE l.user_id = u.id) as treasure_value
+        FROM
+            lotto_live_user u ,lotto_host_user h,lotto_host_room r
+        WHERE
+            u.id = h.user_id  and u.id= r.host_id AND h.room_id =#{roomId}
+
+    </select>
+
+    <select id="getLiving" resultType="string">
+        SELECT
+            y_live_time
+        FROM
+            lotto_live_record
+        WHERE
+            STATUS = 1
+            AND room_id = #{roomId}
+    </select>
+
+    <select id="getResult" resultType="com.bh.live.model.trade.Order">
+        SELECT
+            account_id,
+            award_state,
+            profit_amount,
+            profit_rate,
+            buy_time
+        FROM
+            lotto_order
+        WHERE
+            account_id = #{hostId}
+            AND STATUS > 3
+            AND buy_time >= #{startTime}
+            LIMIT 10
+    </select>
+    <select id="getAdvance" resultType="com.bh.live.pojo.res.anchor.HostAdvanceRes">
+        SELECT * FROM
+            lotto_host_advance
+        WHERE
+            host_id =  #{hostId}
+            AND is_usable = 1
+            AND is_using =1
+            AND seed_no = #{seedNo}
+    </select>
+    <select id="getLiveRecommend" resultType="com.bh.live.pojo.res.anchor.LiveAdvanceRes">
+        SELECT
+            u.user_id,
+            u.hot_val,
+            u.room_id,
+            lu.nickname,
+            lu.image_url,
+            h.open_time,
+            h.live_cover
+        FROM
+            lotto_host_user u,
+            lotto_live_user lu,
+            lotto_host_room h
+        WHERE
+            u.user_id = h.host_id
+            AND u.user_id= lu.id
+            AND h.STATUS = 1
+            AND h.is_usable = 1
+        ORDER BY
+            h.live_cover DESC
+            LIMIT 4
+    </select>
+    <select id="getSeedByRoom" resultType="java.lang.Integer">
+        SELECT lotto_id FROM lotto_host_room WHERE  id= #{roomId}
+    </select>
+
+</mapper>

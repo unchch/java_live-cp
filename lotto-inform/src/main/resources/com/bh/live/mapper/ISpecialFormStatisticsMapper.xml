@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.SpecialFormStatisticsDao">
+    <!--获取时间段的期数号码 -->
+    <select id="getSpecialFormList" parameterType="java.util.Map"
+            resultType="com.bh.live.pojo.res.inform.SpecialFormStatisticsRes">
+        (
+        SELECT
+            <choose>
+                <when test='param.varietyType =="2" or param.varietyType =="3" or param.varietyType =="7" or param.varietyType =="10"'>
+                    CASE WHEN  ${param.number} in(1,2,3,4,0) then'小' else '大' END 'bigSmall',
+                    CASE WHEN  ${param.number} in(1,3,5,7,9) then'单' else '双' END 'singleDouble'
+                </when>
+                <when test='param.varietyType == "8" or param.varietyType == "5" '>
+                    CASE WHEN ${param.number} in(1,2,3,4,5,6,7,8,9,10) then'小' else '大' END 'bigSmall',
+                    CASE WHEN ${param.number} in(1,3,5,7,9,11,13,15,17,19) then'单' else '双' END 'singleDouble'
+                </when>
+                <when test='param.varietyType == "9" '>
+                        CASE WHEN  ${param.number} in(1,2,3,4,5) then'小'
+                        WHEN  ${param.number} IN(6,7,8,9,10,11) then '大' END 'bigSmall',
+                        CASE WHEN  ${param.number} in(1,3,5,7,9,11) then'单' else '双' END 'singleDouble'
+                </when>
+                <otherwise>
+                    CASE WHEN  ${param.number} in(1,2,3,4,5) then'小' else '大' END 'bigSmall',
+                    CASE WHEN  ${param.number} in(1,3,5,7,9) then'单' else '双' END 'singleDouble'
+                </otherwise>
+            </choose>
+            <if test="param.dragonTiger!='' and param.dragonTiger !=null">
+                ,${praam.dragonTiger} dragonTiger
+            </if>
+        FROM t_variety_current
+        WHERE 1=1
+        <!--根据彩种 -->
+        <if test="param.varietyType!=null and param.varietyType!=''">
+            and variety_type=#{param.varietyType}
+        </if>
+        <if test="param.timeDate=='week'">
+           and  DATE_SUB(CURDATE(), INTERVAL 1 WEEK) &lt;= date(open_time)
+        </if>
+        <if test="param.timeDate=='oneMonth'">
+           and  DATE_SUB(CURDATE(), INTERVAL 1 MONTH) &lt;= date(open_time)
+        </if>
+        <if test="param.timeDate=='threeMonth'">
+           and  DATE_SUB(CURDATE(), INTERVAL 3 MONTH) &lt;= date(open_time)
+        </if>
+        )
+        UNION
+        (
+        SELECT
+        <choose>
+            <when test='param.varietyType =="2" or param.varietyType =="3" or param.varietyType =="7" or param.varietyType =="10"'>
+                CASE WHEN  ${param.number} in(1,2,3,4,0) then'小' else '大' END 'bigSmall',
+                CASE WHEN  ${param.number} in(1,3,5,7,9) then'单' else '双' END 'singleDouble'
+            </when>
+            <when test='param.varietyType == "8" or param.varietyType == "5" '>
+                CASE WHEN ${param.number} in(1,2,3,4,5,6,7,8,9,10) then'小' else '大' END 'bigSmall',
+                CASE WHEN ${param.number} in(1,3,5,7,9,11,13,15,17,19) then'单' else '双' END 'singleDouble'
+            </when>
+            <when test='param.varietyType == "9" '>
+                CASE WHEN  ${param.number} in(1,2,3,4,5) then'小'
+                WHEN  ${param.number} IN(6,7,8,9,10,11) then '大' END 'bigSmall',
+                CASE WHEN  ${param.number} in(1,3,5,7,9,11) then'单' else '双' END 'singleDouble'
+            </when>
+            <otherwise>
+                CASE WHEN  ${param.number} in(1,2,3,4,5) then'小' else '大' END 'bigSmall',
+                CASE WHEN  ${param.number} in(1,3,5,7,9) then'单' else '双' END 'singleDouble'
+            </otherwise>
+        </choose>
+        <if test="param.dragonTiger!='' and param.dragonTiger !=null">
+            ,${praam.dragonTiger} dragonTiger
+        </if>
+        FROM t_variety_current
+        WHERE 1=1
+        <!--根据彩种 -->
+        <if test="param.varietyType!=null and param.varietyType!=''">
+            and variety_type=#{param.varietyType}
+        </if>
+        <if test="param.timeDate=='week'">
+            and  DATE_SUB(CURDATE(), INTERVAL 1 WEEK) &gt;= date(open_time)
+        </if>
+        <if test="param.timeDate=='oneMonth'">
+            and  DATE_SUB(CURDATE(), INTERVAL 1 MONTH) &gt;= date(open_time)
+        </if>
+        <if test="param.timeDate=='threeMonth'">
+            and  DATE_SUB(CURDATE(), INTERVAL 3 MONTH) &gt;= date(open_time)
+        </if>
+        limit 0,3
+        )
+        order by open_time desc
+    </select>
+
+</mapper>

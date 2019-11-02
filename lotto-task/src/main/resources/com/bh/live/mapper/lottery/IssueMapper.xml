@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.task.dao.lottery.IssueDao">
+
+    <!-- 批量插入彩期 -->
+    <insert id="batchInsertIssue" parameterType="java.util.List">
+        INSERT INTO lotto_issue(
+            `issue_no`, `seed_no`,
+            `start_time`, `closing_time`, `end_time`, `open_time`,
+            `closing_seconds`, `lifetime`,
+            `pre_issue`, period_issue
+        ) VALUES
+        <foreach collection="list" item="issue" open="" close="" separator=",">
+        (
+            #{issue.issueNo} , #{issue.seedNo},
+            #{issue.startTime}, #{issue.closingTime}, #{issue.endTime}, #{issue.openTime},
+            #{issue.closingSeconds}, #{issue.lifetime},
+            #{issue.preIssue}, #{issue.periodIssue}
+        )
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,74 @@
+server:
+  port: 9300
+
+spring:
+  application:
+    name: lotto-zuul-gateway
+  profiles:
+    active: @profileActive@
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+  jackson:
+    date-format: yyyy-MM-dd
+    joda-date-time-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+#配置网关反向代理
+zuul:
+  routes:
+    trade-service:
+      ###以trade/访问转发到订单交易中心
+      sensitiveHeaders: Access-Control-Allow-Origin,Access-Control-Allow-Methods
+      path: /trade/**
+      serviceId: lotto-trade
+      strip-prefix: false
+    user-service:              #
+      #设置路由到后端的时候忽略掉跨域头信息
+      sensitiveHeaders: Access-Control-Allow-Origin,Access-Control-Allow-Methods
+      ###以/user/访问转发到用户中心
+      path: /user/**
+      serviceId: lotto-user
+      strip-prefix: false
+    pay-service:              #
+      #设置路由到后端的时候忽略掉跨域头信息
+      sensitiveHeaders: Access-Control-Allow-Origin,Access-Control-Allow-Methods
+      ###以/pay/访问转发到支付中心
+      path: /pay/**
+      serviceId: lotto-pay
+      strip-prefix: false
+    infrom-service:              #
+      #设置路由到后端的时候忽略掉跨域头信息
+      sensitiveHeaders: Access-Control-Allow-Origin,Access-Control-Allow-Methods
+      ###以/infrom/访问转发到资讯，广告，公告，营销中心
+      path: /inform/**
+      serviceId: lotto-inform
+      strip-prefix: false
+  ignored-services: '*' #忽略框架默认的服务映射路径
+  ignored-headers: false #不忽略框架与权限相关的头信息
+  add-host-header: true
+
+ribbon:
+  eureka:
+    enabled: true #ribbon 禁用eureka
+
+#配置token拦截的url
+authorization:
+   access:
+      urls: /user/center/*,/user/attention/*,/user/chat/*,/user/roomManger/*,/user/no-talk/*,/user/keyword-shield/*,
+            /user/hostUser/detail/*,/user/hostUser/update,/trade/order,/user/trade-award/add,/user/user-income/*,
+            /trade/lottery/*,/user/no-talk-conf/*,/user/barrage-conf/*,/user/live-record/*,/user/anchor_room/hostUserInfo,/user/anchor_room/anchor_recommend,
+            /trade/order/queryOrderListHistory,/trade/order/queryUserOrderStatistics,/trade/guessingOrderList/queryTransPage,/trade/guessingOrderList/queryTradeAllTransUser,
+            /trade/guessingOrderList/queryOrderList,/trade/guessingOrderList/queryOrderListHistory,/trade/guessingOrderList/queryUserOrderStatistics,
+            /user/host/advance/addHostAdvance, /user/host/advance/updateHostAdvance,/user/host/advance/queryHostRoomListBySize,/user/host/advance/queryAdvanceByHostId,
+            /trade/guessingOrderList/queryTradeAllTransUser,/user/hostUser/homePage/*,/user/liveSeed/liveList,/user/hostUser/getPhone,/user/anchor_room/getNotice,
+            /user/anchor_room/updateNotice,/user/center/infoById,/host/advance/queryHostUserListBySize,/host/advance/queryHostRoomListBySize,/host/advance/homeSearch,
+            /trade/guessingOrderList/queryOrderListHistory,/user/anchor_room/attention_anchor
+   pass:
+     urls: /user/anchor_room/hostUserInfo,/trade/guessingOrderList/queryOrderList,/trade/guessingOrderList/queryOrderListHistory,/trade/guessingOrderList/queryUserOrderStatistics,
+          /user/host/advance/queryHostRoomListBySize,/user/hostUser/homePage/*,/user/liveSeed/liveList,/user/anchor_room/anchor_recommend,/user/center/infoById,/host/advance/queryLiveHostStateById,
+          /host/advance/queryHostUserListBySize,/host/advance/queryHostRoomListBySize,/host/advance/homeSearch,/trade/guessingOrderList/queryOrderListHistory,/user/anchor_room/attention_anchor,
+          /user/chat/page
+

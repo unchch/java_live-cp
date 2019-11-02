@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.anchor.HostUserDao">
+
+    <!--获取主播管理列表，多表关联-->
+    <select id="getListByPage" resultType="com.bh.live.pojo.res.anchor.HostUserRes"
+            parameterType="com.bh.live.pojo.req.anchor.HostUserReq">
+        SELECT lh.id,lh.user_id,lh.room_id,lh.status,lh.username,lh.sex,lh.host_lv,lh.create_time,lh.verify_time,
+        lh.settlement_type,lh.verify_status,lh.adept_lottery,lh.is_usable,lh.recomm_home_page,lh.sort,lw.all_money balance,
+        ltt.bandType,ifnull(ltt.rechargeAmount,0) rechargeAmount,ifnull(ltt.withdrawAmount,0) withdrawAmount,
+        ifnull(ltt.withdrawCount,0) withdrawCount,lu.terminal device,lu.lastlogin lastLoginTime
+        FROM `lotto_host_user` lh
+        left join
+        lotto_live_user lu on lh.user_id=lu.id
+        left join
+        <!--##彩币余额-->
+        (select user_id,all_money from lotto_wallet) lw on lw.user_id=lh.user_id
+        left join
+        <!--##累计充值&最新一次充值银行卡类型&提现-->
+        (select user_id,
+        (case when trans_type=1 then sum(trans_amount) end) rechargeAmount,
+        (case when trans_type=5 then sum(trans_amount) end) withdrawAmount,
+        (case when trans_type=5 then count(distinct user_id) end) withdrawCount,
+        (select l.bank_type from lotto_trade_trans_user l where l.user_id = lt.user_id
+        order by l.create_time desc LIMIT 1) bandType
+        from lotto_trade_trans_user lt where lt.trans_status = 1 GROUP BY user_id) ltt
+        on lh.user_id=ltt.user_id
+        where 1=1
+        <if test="param.userId != null and param.userId != ''">
+            and lh.user_id = #{param.userId}
+        </if>
+        <if test="param.username != null and param.username != ''">
+            and lh.username like concat(concat('%',#{param.username},'%'))
+        </if>
+        <if test="param.adeptLottery != null and param.adeptLottery != ''">
+            and find_in_set(#{param.adeptLottery},lh.adept_lottery)
+        </if>
+        <if test="param.settlementType != null">
+            and lh.settlement_type = #{param.settlementType}
+        </if>
+        <if test="param.status != null">
+            and lh.status = #{param.status}
+        </if>
+
+    </select>
+    <!--用户详情，多表关联查询-->
+    <select id="userDetail" resultType="com.bh.live.pojo.res.anchor.HostUserResDetail">
+        select lhu.id,lhu.user_id,lhu.username,lhu.telephone,lhu.email,lhu.sex,lhu.room_id,lhu.real_name,
+         lhu.card_num,lhu.address,lhu.age,lhu.invite_code,lhu.is_usable,lhu.host_lv,lhu.create_time beComeHostTime,
+         lhu.verify_time,lhu.settlement_cycle,lhu.experience,lhu.settlement_type,lhu.st_value,lhu.adept_lottery,
+         lhu.age_limit,lhu.sort,lhu.recomm_home_page,lhu.icon,lhu.cover,lhu.gallery,lu.terminal device,lu.is_expert,lu.is_anchor,
+         lu.creat_time createTime,lu.lastlogin,op.WXopenId,op.ZFBopenId,op.WBOpenId,op.QQopenId,lw.is_freeze unUse
+        from lotto_host_user lhu
+        left join lotto_live_user lu on lhu.user_id=lu.id
+        left join
+        <!--##帐号类型  0微信 1支付宝 2银行卡 3微博-->
+        (select user_id,
+        MAX(case when account_type = 0 then openid END) WXOpenId,
+        MAX(case when account_type = 1 then openid END) ZFBOpenId,
+        MAX(case when account_type = 3 then openid END) WBOpenId,
+        MAX(case when account_type = 4 then openid END) QQOpenId
+        from lotto_binding_account where is_usable=1 and is_delete=1) op on op.user_id=lhu.user_id
+        left join lotto_wallet lw on lw.user_id=lhu.user_id
+        where lhu.user_id=#{userId}
+    </select>
+</mapper>

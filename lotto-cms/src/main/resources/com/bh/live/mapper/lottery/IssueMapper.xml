@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.lottery.IssueDao">
+
+    <select id="selectByIssueReq"
+            parameterType="com.bh.live.pojo.req.lottery.IssueReq"
+            resultType="com.bh.live.pojo.res.lottery.IssueRes">
+        SELECT i.id, issue_no ,i.seed_no,s.seed_name ,start_time,end_time,open_time,result,prize_state,i.status
+        FROM lotto_issue i
+        INNER JOIN lotto_seed s on i.seed_no = s.seed_no
+        WHERE i.seed_No = ${param.seedNo}
+        <if test="param.issueNo != null and param.issueNo != ''">
+            AND i.issue_no = ${param.issueNo}
+        </if>
+        <if test="param.status != null">
+            AND i.status = ${param.status}
+        </if>
+        <choose>
+            <when test="(param.startTime != null and param.startTime != '') and param.endTime == null">
+                <![CDATA[    AND  (DATE_FORMAT(i.open_time, '%Y-%m-%d') = STR_TO_DATE("${param.startTime}", '%Y-%m-%d'))]]>
+            </when>
+            <when test="param.startTime == null and (param.endTime != null and param.endTime != '')">
+                <![CDATA[    AND  (DATE_FORMAT(i.open_time, '%Y-%m-%d') = STR_TO_DATE("${param.endTime}", '%Y-%m-%d'))]]>
+            </when>
+            <when test="(param.startTime != null and param.endTime != null) and (param.startTime != '' and param.endTime != '')">
+                <![CDATA[    AND  (DATE_FORMAT(i.open_time, '%Y-%m-%d') Between STR_TO_DATE("${param.startTime}", '%Y-%m-%d') and STR_TO_DATE("${param.endTime}", '%Y-%m-%d'))]]>
+            </when>
+        </choose>
+        ORDER BY i.issue_no DESC
+    </select>
+</mapper>

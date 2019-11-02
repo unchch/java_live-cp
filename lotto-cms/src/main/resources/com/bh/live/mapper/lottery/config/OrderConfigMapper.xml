@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.lottery.config.OrderConfigDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.lottery.config.OrderConfig">
+        <id column="id" property="id" />
+        <result column="seed_no" property="seedNo" />
+        <result column="user_group" property="userGroup" />
+        <result column="user_show_group" property="userShowGroup" />
+        <result column="end_time" property="endTime" />
+        <result column="max_num" property="maxNum" />
+        <result column="prize_on_off" property="prizeOnOff" />
+        <result column="person" property="person" />
+        <result column="avg_coin_min" property="avgCoinMin" />
+        <result column="av_coin_max" property="avCoinMax" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, seed_no, user_group, user_show_group, end_time, max_num, prize_on_off, person, avg_coin_min, av_coin_max, create_time, update_time, create_by, modify_by
+    </sql>
+
+    <select id="selectOrderConfig" parameterType="com.bh.live.model.lottery.config.vo.OrderConfigVO" resultType="com.bh.live.pojo.res.lottery.config.OrderConfigRes">
+         select a.*,b.seed_name,b.category_no from lotto_order_config a
+         inner join lotto_seed b on a.seed_no=b.seed_no
+         where 1=1
+         <if test="vo.id != null">
+             and a.id = #{vo.id}
+         </if>
+    </select>
+</mapper>

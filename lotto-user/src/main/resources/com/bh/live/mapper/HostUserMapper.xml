@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.HostUserDao">
+
+    <select id="getUserHomePageDetail" resultType="com.bh.live.pojo.res.anchor.HostUserHomePageRes">
+        select lhu.status,lhu.username nickname,lhu.hot_val,lw.all_money moneyAmount,lhu.gallery,lhu.icon,
+        lhu.personal_profile,lhu.room_id,lr.seed_no,lr.logo,lhu.live_time,
+        (select count(user_id) from lotto_attention where target_id=lhu.user_id) fansCount
+        from lotto_host_user lhu
+        left join lotto_wallet lw on lw.user_id=lhu.user_id
+        left join (
+          select r.host_id,s.seed_no,s.logo_pc_icon logo from lotto_host_room r
+          left join lotto_seed s on r.lotto_id=s.seed_no
+        )lr on lr.host_id=lhu.user_id
+        where lhu.user_id=#{userId}
+    </select>
+
+    <select id="getUserAttention" resultType="com.bh.live.model.user.Attention">
+        select user_id,target_id,is_attent from lotto_attention where 1=1
+        <if test="type=='one'">
+            and user_id=#{loginUser} and target_id=#{userId}
+        </if>
+        <if test="type=='list'">
+            and target_id in
+            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+             and user_id=#{loginUser}
+        </if>
+    </select>
+
+</mapper>

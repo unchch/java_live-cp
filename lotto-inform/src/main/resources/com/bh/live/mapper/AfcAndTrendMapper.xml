@@ -1,0 +1,67 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.AfcAndTrendDao">
+
+    <select id="queryAfcAndTrendTop" parameterType="java.lang.Integer" resultType="com.bh.live.pojo.res.inform.AfcAndTrendRes">
+       SELECT
+            SUM(threeCount) threeCount,
+            SUM(fourCount) fourCount,
+            SUM(fiveCount) fiveCount,
+            SUM(sixCount) sixCount,
+            SUM(sevenCount) sevenCount,
+            SUM(eightCount) eightCount,
+            SUM(nineCount) nineCount,
+            SUM(tenCount) tenCount,
+            SUM(elevenCount) elevenCount,
+            SUM(twelveCount) twelveCount,
+            SUM(thirteenCount) thirteenCount,
+            SUM(fourteenCount) fourteenCount,
+            SUM(fifteenCount) fifteenCount,
+            SUM(sixteenCount) sixteenCount,
+            SUM(seventeenCount) seventeenCount,
+            SUM(eighteenCount) eighteenCount,
+            SUM(nineteenCount) nineteenCount,
+            SUM(singleCount) singleCount,
+            SUM(doubleCount) doubleCount,
+			SUM(bigCount) bigCount,
+			SUM(smallCount) smallCount,
+            SUM(beforeCount)beforeCount,
+            SUM(middleCount)middleCount,
+            SUM(behindCount) behindCount
+         FROM
+         (
+            select
+            IFNULL((case when crown_sub = 3 then 1 else 0 end),0) threeCount,
+            IFNULL((case when crown_sub = 4 then 1 else 0 end),0) fourCount,
+            IFNULL((case when crown_sub = 5 then 1 else 0 end),0) fiveCount,
+            IFNULL((case when crown_sub = 6 then 1 else 0 end),0) sixCount,
+            IFNULL((case when crown_sub = 7 then 1 else 0 end),0) sevenCount,
+            IFNULL((case when crown_sub = 8 then 1 else 0 end),0) eightCount,
+            IFNULL((case when crown_sub = 9 then 1 else 0 end),0) nineCount,
+            IFNULL((case when crown_sub = 10 then 1 else 0 end),0) tenCount,
+            IFNULL((case when crown_sub = 11 then 1 else 0 end),0) elevenCount,
+            IFNULL((case when crown_sub = 12 then 1 else 0 end),0) twelveCount,
+            IFNULL((case when crown_sub = 13 then 1 else 0 end),0) thirteenCount,
+            IFNULL((case when crown_sub = 14 then 1 else 0 end),0) fourteenCount,
+            IFNULL((case when crown_sub = 15 then 1 else 0 end),0) fifteenCount,
+            IFNULL((case when crown_sub = 16 then 1 else 0 end),0) sixteenCount,
+            IFNULL((case when crown_sub = 17 then 1 else 0 end),0) seventeenCount,
+            IFNULL((case when crown_sub = 18 then 1 else 0 end),0) eighteenCount,
+            IFNULL((case when crown_sub = 19 then 1 else 0 end),0) nineteenCount
+            from t_variety_current
+             <where>
+                 variety_type = #{varietyType}
+                 <choose>
+                     <when test="expect == 1">
+                         DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') ORDER BY open_time desc
+                     </when>
+                     <otherwise>
+                         ORDER BY open_time desc limit #{expect}
+                     </otherwise>
+                 </choose>
+             </where>
+       )tab
+    </select>
+
+</mapper>

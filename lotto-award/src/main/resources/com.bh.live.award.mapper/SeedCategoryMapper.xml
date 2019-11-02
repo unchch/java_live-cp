@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.award.dao.SeedCategoryDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.lottery.SeedCategory">
+        <id column="id" property="id" />
+        <result column="category_no" property="categoryNo" />
+        <result column="category_name" property="categoryName" />
+        <result column="icon_small_url" property="iconSmallUrl" />
+        <result column="icon_large_url" property="iconLargeUrl" />
+        <result column="sort" property="sort" />
+        <result column="category_desc" property="categoryDesc" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, category_no, category_name, icon_small_url, icon_large_url, sort, category_desc
+    </sql>
+
+</mapper>

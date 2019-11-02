@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.StatHistoryStatisticsDao">
+    <!-- 北京PK拾历史统计大小单双-->
+    <select id="getHistoryStatisticsList" parameterType="java.util.Map"
+            resultType="com.bh.live.pojo.res.inform.StatHistoryStatisticsRes">
+        select DATE_FORMAT(open_time,'%Y-%m-%d') as openTime,
+			count(case when number_one_ball in (1,2,3,4,5) then 1 end) as oneLittle,
+			count(case when number_one_ball in (6,7,8,9,10) then 1 end) as oneBig,
+			count(case when number_one_ball in (1,3,5,7,9) then 1 end) as oneSingle,
+			count(case when number_one_ball in (2,4,6,8,10) then 1 end) as oneDoubles,
+			count(case when number_two_ball in (1,2,3,4,5) then 1 end) as twoLittle,
+			count(case when number_two_ball in (6,7,8,9,10) then 1 end) as twoBig,
+			count(case when number_two_ball in (1,3,5,7,9) then 1 end) as twoSingle,
+			count(case when number_two_ball in (2,4,6,8,10) then 1 end) as twoDoubles,
+			count(case when number_three_ball in (1,2,3,4,5) then 1 end) as threeLittle,
+			count(case when number_three_ball in (6,7,8,9,10) then 1 end) as threeBig,
+			count(case when number_three_ball in (1,3,5,7,9) then 1 end) as threeSingle,
+			count(case when number_three_ball in (2,4,6,8,10) then 1 end) as threeDoubles,
+			count(case when number_four_ball in (1,2,3,4,5) then 1 end) as fourLittle,
+			count(case when number_four_ball in (6,7,8,9,10) then 1 end) as fourBig,
+			count(case when number_four_ball in (1,3,5,7,9) then 1 end) as fourSingle,
+			count(case when number_four_ball in (2,4,6,8,10) then 1 end) as fourDoubles,
+			count(case when number_five_ball in (1,2,3,4,5) then 1 end) as fiveLittle,
+			count(case when number_five_ball in (6,7,8,9,10) then 1 end) as fiveBig,
+			count(case when number_five_ball in (1,3,5,7,9) then 1 end) as fiveSingle,
+			count(case when number_five_ball in (2,4,6,8,10) then 1 end) as fiveDoubles,
+			count(case when number_six_ball in (1,2,3,4,5) then 1 end) as sixLittle,
+			count(case when number_six_ball in (6,7,8,9,10) then 1 end) as sixBig,
+			count(case when number_six_ball in (1,3,5,7,9) then 1 end) as sixSingle,
+			count(case when number_six_ball in (2,4,6,8,10) then 1 end) as sixDoubles,
+			count(case when number_seven_ball in (1,2,3,4,5) then 1 end) as sevenLittle,
+			count(case when number_seven_ball in (6,7,8,9,10) then 1 end) as sevenBig,
+			count(case when number_seven_ball in (1,3,5,7,9) then 1 end) as sevenSingle,
+			count(case when number_seven_ball in (2,4,6,8,10) then 1 end) as sevenDoubles,
+			count(case when number_eight_ball in (1,2,3,4,5) then 1 end) as eightLittle,
+			count(case when number_eight_ball in (6,7,8,9,10) then 1 end) as eightBig,
+			count(case when number_eight_ball in (1,3,5,7,9) then 1 end) as eightSingle,
+			count(case when number_eight_ball in (2,4,6,8,10) then 1 end) as eightDoubles,
+			count(case when number_nine_ball in (1,2,3,4,5) then 1 end) as nineLittle,
+			count(case when number_nine_ball in (6,7,8,9,10) then 1 end) as nineBig,
+			count(case when number_nine_ball in (1,3,5,7,9) then 1 end) as nineSingle,
+			count(case when number_nine_ball in (2,4,6,8,10) then 1 end) as nineDoubles,
+			count(case when number_ten_ball in (1,2,3,4,5) then 1 end) as tenLittle,
+			count(case when number_ten_ball in (6,7,8,9,10) then 1 end) as tenBig,
+			count(case when number_ten_ball in (1,3,5,7,9) then 1 end) as tenSingle,
+			count(case when number_ten_ball in (2,4,6,8,10) then 1 end) as tenDoubles
+		from t_variety_current where variety_type = #{param.varietyType}
+	    GROUP BY DATE_FORMAT(open_time,'%Y-%m-%d') ORDER BY open_time DESC limit 20
+	</select>
+    <!-- 历史统计(龙虎)-->
+    <select id="getDragonTigerList" parameterType="java.util.Map"
+            resultType="com.bh.live.pojo.res.inform.StatHistoryStatisticsRes">
+		select DATE_FORMAT(open_time,'%Y-%m-%d') open_time,
+		count(case when number_one_ball>number_ten_ball then 1 end) as championDragon,
+		count(case when number_one_ball&lt;number_ten_ball then 1 end) as championTiger,
+		count(case when number_two_ball>number_nine_ball  then 1 end) as secondDragon,
+		count(case when number_two_ball&lt;number_nine_ball then 1 end) as secondTiger,
+		count(case when number_three_ball>number_eight_ball then 1 end) as thirdDragon,
+		count(case when number_three_ball&lt;number_eight_ball then 1 end) as thirdTiger,
+		count(case when number_four_ball>number_seven_ball  then 1 end) as fourthDragon,
+		count(case when number_four_ball&lt;number_seven_ball then 1 end) as fourthTiger,
+		count(case when number_five_ball>number_six_ball  then 1 end) as fifthDragon,
+		count(case when number_five_ball&lt;number_six_ball then 1 end) as fifthTiger
+		from t_variety_current where variety_type = #{param.varietyType}
+		GROUP BY DATE_FORMAT(open_time,'%Y-%m-%d') ORDER BY open_time DESC limit 20
+	</select>
+
+    <!-- 历史统计 (冠亚和统计)-->
+    <select id="getCrownSubCount" parameterType="java.util.Map"
+            resultType="com.bh.live.pojo.res.inform.StatHistoryStatisticsRes">
+		SELECT DATE_FORMAT(open_time,'%Y-%m-%d') as openTime,
+		COUNT( case when crown_sub>11 then 1 end) as crownSubBig,
+		COUNT(case when crown_sub &lt;=11 then 1 end) as crownSubLittle,
+		COUNT( case when crown_sub%2=1 then 1 end) as  oddNumber,
+		COUNT(case when crown_sub%2=0 then 1 end) as evenNumber
+		from t_variety_current where variety_type = #{param.varietyType}
+		GROUP BY DATE_FORMAT(open_time,'%Y-%m-%d') ORDER BY open_time DESC limit 20
+	</select>
+
+
+    <!-- 时时彩 历史统计(综合) -->
+    <select id="statHistoryZh" parameterType="java.lang.Integer" resultType="java.util.Map">
+		SELECT
+		DATE_FORMAT(open_time,'%Y-%m-%d') openTime,
+		<choose>
+			<when test=" varietyType == 4">
+				SUM(number_one_ball =1) one1,SUM(number_two_ball =1)one2, SUM(number_three_ball =1) one3,
+				SUM(number_one_ball =2) two1,SUM(number_two_ball =2)two2, SUM(number_three_ball =2) two3,
+				SUM(number_one_ball =3) three1,SUM(number_two_ball =3)three2, SUM(number_three_ball =3) three3,
+				SUM(number_one_ball =4) four1,SUM(number_two_ball =4)four2, SUM(number_three_ball =4) four3,
+				SUM(number_one_ball =5) five1,SUM(number_two_ball =5)five2, SUM(number_three_ball =5) five3,
+				SUM(number_one_ball =6) six1,SUM(number_two_ball =6)six2, SUM(number_three_ball =6) six3
+			</when>
+			<otherwise>
+				SUM(number_one_ball =0) one1,SUM(number_two_ball =0)one2, SUM(number_three_ball =0) one3,SUM(number_four_ball=0) one4,SUM(number_five_ball =0) one5,
+				SUM(number_one_ball =1) two1,SUM(number_two_ball =1)two2, SUM(number_three_ball =1) two3,SUM(number_four_ball=1) two4,SUM(number_five_ball =1) two5,
+				SUM(number_one_ball =2) three1,SUM(number_two_ball =2)three2, SUM(number_three_ball =2) three3,SUM(number_four_ball=2) three4,SUM(number_five_ball =2) three5,
+				SUM(number_one_ball =3) four1,SUM(number_two_ball =3)four2, SUM(number_three_ball =3) four3,SUM(number_four_ball=3) four4,SUM(number_five_ball =3) four5,
+				SUM(number_one_ball =4) five1,SUM(number_two_ball =4)five2, SUM(number_three_ball =4) five3,SUM(number_four_ball=4) five4,SUM(number_five_ball =4) five5,
+				SUM(number_one_ball =5) six1,SUM(number_two_ball =5)six2, SUM(number_three_ball =5) six3,SUM(number_four_ball=0) six4,SUM(number_five_ball =5) six5,
+				SUM(number_one_ball =6) seven1,SUM(number_two_ball =6)seven2, SUM(number_three_ball =6) seven3,SUM(number_four_ball=6) seven4,SUM(number_five_ball =6) seven5,
+				SUM(number_one_ball =7) eight1,SUM(number_two_ball =7)eight2, SUM(number_three_ball =7) eight3,SUM(number_four_ball=7) eight4,SUM(number_five_ball =7) eight5,
+				SUM(number_one_ball =8) nine1,SUM(number_two_ball =8)nine2, SUM(number_three_ball =8) nine3,SUM(number_four_ball=8) nine4,SUM(number_five_ball =8) nine5,
+				SUM(number_one_ball =9) ten1,SUM(number_two_ball =9)ten2, SUM(number_three_ball =9) ten3,SUM(number_four_ball=9) ten4,SUM(number_five_ball =9) ten5,
+				SUM(case when first_dragon_tiger ='龙'  then 1 else 0 end) longCount,
+				SUM(case when first_dragon_tiger ='虎'  then 1 else 0 end) huCount,
+				SUM(case when first_dragon_tiger ='和'  then 1 else 0 end) heCount
+			</otherwise>
+		</choose>
+		FROM t_variety_current where variety_type =#{varietyType}
+		<choose>
+			<when test="varietyType ==3 or varietyType ==7" >
+				GROUP BY substring(expect,1,8)  ORDER BY open_time DESC limit 30
+			</when>
+			<otherwise>
+				GROUP BY DATE_FORMAT(open_time,'%Y-%m-%d') ORDER BY open_time desc limit 31
+			</otherwise>
+		</choose>
+	</select>
+
+    <!-- 时时彩 历史统计(单双大小) -->
+    <select id="statHistorySingleDouble" parameterType="java.lang.Integer" resultType="java.util.Map">
+		select DATE_FORMAT(open_time,'%Y-%m-%d') as openTime,
+		SUM(case when number_one_ball &gt;4 then 1 end) as oneBig,
+		SUM(case when number_one_ball &lt;=4 then 1 end) as oneSmall,
+		SUM(case when number_one_ball in (1,3,5,7,9) then 1 end) as oneSingle,
+		SUM(case when number_one_ball in (0,2,4,6,8) then 1 end) as oneDouble,
+		SUM(case when number_two_ball  &gt;4 then 1 end) as twoBig,
+		SUM(case when number_two_ball  &lt;=4 then 1 end) as twoSmall,
+		SUM(case when number_two_ball in (1,3,5,7,9) then 1 end) as twoSingle,
+		SUM(case when number_two_ball in (0,2,4,6,8) then 1 end) as twoDouble,
+		SUM(case when number_three_ball &gt;4 then 1 end) as threeBig,
+		SUM(case when number_three_ball  &lt;=4 then 1 end) as threeSmall,
+		SUM(case when number_three_ball in (1,3,5,7,9) then 1 end) as threeSingle,
+		SUM(case when number_three_ball in (0,2,4,6,8) then 1 end) as threeDouble,
+		SUM(case when number_four_ball &gt;4 then 1 end) as fourBig,
+		SUM(case when number_four_ball  &lt;=4 then 1 end) as fourSmall,
+		SUM(case when number_four_ball in (1,3,5,7,9) then 1 end) as fourSingle,
+		SUM(case when number_four_ball in (0,2,4,6,8) then 1 end) as fourDouble,
+		SUM(case when number_five_ball &gt;4 then 1 end) as fiveBig,
+		SUM(case when number_five_ball  &lt;=4 then 1 end) as fiveSmall,
+		SUM(case when number_five_ball in (1,3,5,7,9) then 1 end) as fiveSingle,
+		SUM(case when number_five_ball in (0,2,4,6,8) then 1 end) as fiveDouble
+		FROM t_variety_current
+		where  variety_type =#{varietyType}
+		<choose>
+			<when test="varietyType ==3 or varietyType ==7" >
+				GROUP BY substring(expect,1,8)  ORDER BY open_time DESC limit 16
+			</when>
+			<otherwise>
+				GROUP BY DATE_FORMAT(open_time,'%Y-%m-%d') ORDER BY open_time DESC limit 16
+			</otherwise>
+		</choose>
+
+   </select>
+
+
+	<!-- 时时彩 历史统计(综合) -->
+	<select id="statHistoryNumZh20" parameterType="java.lang.Integer" resultType="java.util.Map">
+		SELECT
+		DATE_FORMAT(open_time,'%Y-%m-%d') openTime,
+		SUM(case when number_one_ball =1 or number_two_ball =1 or number_three_ball =1 or number_four_ball =1 or number_five_ball =1
+		       or number_six_ball =1 or number_seven_ball =1 or number_eight_ball =1 then 1 end) as oneCount,
+		SUM(case when number_one_ball =2 or number_two_ball =2 or number_three_ball =2 or number_four_ball =2 or number_five_ball =2
+		or number_six_ball =2 or number_seven_ball =2 or number_eight_ball =2 then 1 end) as twoCount,
+		SUM(case when number_one_ball =3 or number_two_ball =3 or number_three_ball =3 or number_four_ball =3 or number_five_ball =3
+		or number_six_ball =3 or number_seven_ball =3 or number_eight_ball =3 then 1 end) as threeCount,
+		SUM(case when number_one_ball =4 or number_two_ball =4 or number_three_ball =4 or number_four_ball =4 or number_five_ball =4
+		or number_six_ball =4 or number_seven_ball =4 or number_eight_ball =4 then 1 end) as fourCount,
+		SUM(case when number_one_ball =5 or number_two_ball =5 or number_three_ball =5 or number_four_ball =5 or number_five_ball =5
+		or number_six_ball =5 or number_seven_ball =5 or number_eight_ball =5 then 1 end) as fiveCount,
+		SUM(case when number_one_ball =6 or number_two_ball =6 or number_three_ball =6 or number_four_ball =6 or number_five_ball =6
+		or number_six_ball =6 or number_seven_ball =6 or number_eight_ball =6 then 1 end) as sixCount,
+		SUM(case when number_one_ball =7 or number_two_ball =7 or number_three_ball =7 or number_four_ball =7 or number_five_ball =7
+		or number_six_ball =7 or number_seven_ball =7 or number_eight_ball =7 then 1 end) as sevenCount,
+		SUM(case when number_one_ball =8 or number_two_ball =8 or number_three_ball =8 or number_four_ball =8 or number_five_ball =8
+		or number_six_ball =8 or number_seven_ball =8 or number_eight_ball =8 then 1 end) as eightCount,
+		SUM(case when number_one_ball =9 or number_two_ball =9 or number_three_ball =9 or number_four_ball =9 or number_five_ball =9
+		or number_six_ball =9 or number_seven_ball =9 or number_eight_ball =9 then 1 end) as nineCount,
+		SUM(case when number_one_ball =10 or number_two_ball =10 or number_three_ball =10 or number_four_ball =10 or number_five_ball =10
+		or number_six_ball =10 or number_seven_ball =10 or number_eight_ball =10 then 1 end) as tenCount,
+		SUM(case when number_one_ball =11 or number_two_ball =11 or number_three_ball =11 or number_four_ball =11 or number_five_ball =11
+		or number_six_ball =11 or number_seven_ball =11 or number_eight_ball =11 then 1 end) as elevenCount,
+		SUM(case when number_one_ball =12 or number_two_ball =12 or number_three_ball =12 or number_four_ball =12 or number_five_ball =12
+		or number_six_ball =12 or number_seven_ball =12 or number_eight_ball =12 then 1 end) as twelveCount,
+		SUM(case when number_one_ball =13 or number_two_ball =13 or number_three_ball =13 or number_four_ball =13 or number_five_ball =13
+		or number_six_ball =13 or number_seven_ball =13 or number_eight_ball =13 then 1 end) as thirteenCount,
+		SUM(case when number_one_ball =14 or number_two_ball =14 or number_three_ball =14 or number_four_ball =14 or number_five_ball =14
+		or number_six_ball =14 or number_seven_ball =14 or number_eight_ball =14 then 1 end) as fourteenCount,
+		SUM(case when number_one_ball =15 or number_two_ball =15 or number_three_ball =15 or number_four_ball =15 or number_five_ball =15
+		or number_six_ball =5 or number_seven_ball =15 or number_eight_ball =15 then 1 end) as fiveteenCount,
+		SUM(case when number_one_ball =16 or number_two_ball =16 or number_three_ball =16 or number_four_ball =16 or number_five_ball =16
+		or number_six_ball =16 or number_seven_ball =16 or number_eight_ball =16 then 1 end) as sixteenCount,
+		SUM(case when number_one_ball =17 or number_two_ball =17 or number_three_ball =17 or number_four_ball =17 or number_five_ball =17
+		or number_six_ball =17 or number_seven_ball =17 or number_eight_ball =17 then 1 end) as seventeenCount,
+		SUM(case when number_one_ball =18 or number_two_ball =18 or number_three_ball =18 or number_four_ball =18 or number_five_ball =18
+		or number_six_ball =18 or number_seven_ball =18 or number_eight_ball =18 then 1 end) as eighteenCount,
+		SUM(case when number_one_ball =19 or number_two_ball =19 or number_three_ball =19 or number_four_ball =19 or number_five_ball =19
+		or number_six_ball =19 or number_seven_ball =19 or number_eight_ball =19 then 1 end) as nineteenCount,
+		SUM(case when number_one_ball =20 or number_two_ball =20 or number_three_ball =20 or number_four_ball =20 or number_five_ball =20
+		or number_six_ball =20 or number_seven_ball =20 or number_eight_ball =20 then 1 end) as twentyCount,
+		SUM(case when first_dragon_tiger ='龙'  then 1 else 0 end) longCount,
+		SUM(case when first_dragon_tiger ='虎'  then 1 else 0 end) huCount
+		FROM t_variety_current where variety_type =#{varietyType}
+		<choose>
+			<when test="varietyType ==3 or varietyType ==7" >
+				GROUP BY substring(expect,1,8)  ORDER BY open_time DESC limit 30
+			</when>
+			<otherwise>
+				GROUP BY DATE_FORMAT(open_time,'%Y-%m-%d') ORDER BY open_time desc limit 31
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 时时彩 历史统计(单双大小) -->
+	<select id="statHistory20SingleDouble" parameterType="java.lang.Integer" resultType="java.util.Map">
+		select DATE_FORMAT(open_time,'%Y-%m-%d') as openTime,
+		SUM(case when number_one_ball &gt;=11 then 1 end) as oneBig,
+		SUM(case when number_one_ball &lt;11 then 1 end) as oneSmall,
+		SUM(case when number_one_ball%2=1 then 1 end) as oneSingle,
+		SUM(case when number_one_ball%2=0 then 1 end) as oneDouble,
+		SUM(case when number_two_ball &gt;=11 then 1 end) as twoBig,
+		SUM(case when number_two_ball &lt;11 then 1 end) as twoSmall,
+		SUM(case when number_two_ball%2=1 then 1 end) as twoSingle,
+		SUM(case when number_two_ball%2=0 then 1 end) as twoDouble,
+		SUM(case when number_three_ball &gt;=11 then 1 end) as threeBig,
+		SUM(case when number_three_ball &lt;11 then 1 end) as threeSmall,
+		SUM(case when number_three_ball%2=1 then 1 end) as threeSingle,
+		SUM(case when number_three_ball%2=0 then 1 end) as threeDouble,
+		SUM(case when number_four_ball &gt;=11 then 1 end) as fourBig,
+		SUM(case when number_four_ball &lt;11 then 1 end) as fourSmall,
+		SUM(case when number_four_ball%2=1 then 1 end) as fourSingle,
+		SUM(case when number_four_ball%2=0 then 1 end) as fourDouble,
+		SUM(case when number_five_ball &gt;=11 then 1 end) as fiveBig,
+		SUM(case when number_five_ball &lt;11 then 1 end) as fiveSmall,
+		SUM(case when number_five_ball%2=1 then 1 end) as fiveSingle,
+		SUM(case when number_five_ball%2=0 then 1 end) as fiveDouble,
+		SUM(case when number_six_ball &gt;=11 then 1 end) as sixBig,
+		SUM(case when number_six_ball &lt;11 then 1 end) as sixSmall,
+		SUM(case when number_six_ball%2=1 then 1 end) as sixSingle,
+		SUM(case when number_six_ball%2=0 then 1 end) as sixDouble,
+		SUM(case when number_seven_ball &gt;=11 then 1 end) as sevenBig,
+		SUM(case when number_seven_ball &lt;11 then 1 end) as seveSmall,
+		SUM(case when number_seven_ball%2=1 then 1 end) as seveSingle,
+		SUM(case when number_seven_ball%2=0 then 1 end) as seveDouble,
+		SUM(case when number_eight_ball &gt;=11 then 1 end) as eightBig,
+		SUM(case when number_eight_ball &lt;11 then 1 end) as eighSmall,
+		SUM(case when number_eight_ball%2=1 then 1 end) as eighSingle,
+		SUM(case when number_eight_ball%2=0 then 1 end) as eighDouble
+		FROM t_variety_current
+		where  variety_type =#{varietyType}
+		<choose>
+			<when test="varietyType ==3 or varietyType ==7" >
+				GROUP BY substring(expect,1,8)  ORDER BY open_time DESC limit 16
+			</when>
+			<otherwise>
+				GROUP BY DATE_FORMAT(open_time,'%Y-%m-%d') ORDER BY open_time DESC limit 16
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="querySpecialCode" parameterType="java.lang.Object" resultType="java.util.Map">
+
+         <if test=" type == 1">
+			 SELECT * FROM (
+			 SELECT
+			 count(1) total ,${ball} ball from t_variety_current where variety_type =11 GROUP BY number_seven_ball ORDER
+			 BY open_time desc limit #{expect} ) A ORDER BY total DESC
+		 </if>
+		<if test=" type == 2">
+			SELECT * FROM (
+			SELECT
+			count(1) total,substring(${ball},LENGTH(${ball}),1) ball from t_variety_current where variety_type =11 GROUP
+			BY substring(number_seven_ball,LENGTH(number_seven_ball),1) ORDER BY open_time desc limit #{expect} )B order by ball asc
+		</if>
+	</select>
+
+	<select id="queryHongKongDragonTiger" resultType="java.util.Map">
+		select
+        CONCAT(left(expect,4),"-",substring(expect,5))expect,
+		case when CAST(number_one_ball AS signed) > CAST(number_two_ball AS signed)  then '龙' else '虎' end as oneTwoDragonTiger,
+		case when CAST(number_one_ball AS signed) > CAST(number_three_ball AS signed) then '龙' else '虎' end as oneThreeDragonTiger,
+		case when CAST(number_one_ball AS signed) > CAST(number_four_ball AS signed) then '龙' else '虎' end as oneFourDragonTiger,
+		case when CAST(number_one_ball AS signed) > CAST(number_five_ball AS signed)then '龙' else '虎' end as oneFiveDragonTiger,
+		case when CAST(number_one_ball AS signed) > CAST(number_six_ball AS signed)then '龙' else '虎' end as oneSixDragonTiger,
+		case when CAST(number_two_ball AS signed) > CAST(number_three_ball AS signed)then '龙' else '虎' end as twoThreeDragonTiger,
+		case when CAST(number_two_ball AS signed) > CAST(number_four_ball AS signed)then '龙' else '虎' end as twoFourDragonTiger,
+		case when CAST(number_two_ball AS signed) > CAST(number_five_ball AS signed)then '龙' else '虎' end as twoFiveDragonTiger,
+		case when CAST(number_two_ball AS signed) > CAST(number_six_ball AS signed)then '龙' else '虎' end as twoSixDragonTiger,
+		case when CAST(number_three_ball AS signed) > CAST(number_four_ball AS signed)then '龙' else '虎' end as threeFourDragonTiger,
+		case when CAST(number_three_ball AS signed) > CAST(number_five_ball AS signed)then '龙' else '虎' end as threeFiveDragonTiger,
+		case when CAST(number_three_ball AS signed) > CAST(number_six_ball AS signed)then '龙' else '虎' end as threeSixDragonTiger,
+		case when CAST(number_four_ball AS signed) > CAST(number_five_ball AS signed)then '龙' else '虎' end as fourFiveDragonTiger,
+		case when CAST(number_four_ball AS signed) > CAST(number_six_ball AS signed)then '龙' else '虎' end as fourSixDragonTiger,
+		case when CAST(number_five_ball AS signed) > CAST( number_six_ball AS signed)then '龙' else '虎' end as fiveSixDragonTiger,
+		case when CAST(number_one_ball AS signed) > CAST(number_seven_ball AS signed)then '龙' else '虎' end as specialCodeDragonTiger
+		from t_variety_current where variety_type = 11 and DATE_FORMAT(open_time,'%Y') =YEAR(CURDATE())  ORDER BY open_time desc
+	</select>
+
+</mapper>

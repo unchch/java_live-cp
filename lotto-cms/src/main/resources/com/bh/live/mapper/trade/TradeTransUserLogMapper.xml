@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.trade.TradeTransUserLogDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.trade.TradeTransUserLog">
+        <id column="id" property="id"/>
+        <result column="trans_code" property="transCode"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_code" property="orderCode"/>
+        <result column="trans_type" property="transType"/>
+        <result column="trans_status" property="transStatus"/>
+        <result column="channel_id" property="channelId"/>
+        <result column="trans_amount" property="transAmount"/>
+        <result column="cash_amount" property="cashAmount"/>
+        <result column="total_cash_balance" property="totalCashBalance"/>
+        <result column="award_flag" property="awardFlag"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, trans_code, user_id, order_code, trans_type, trans_status, channel_id, trans_amount, cash_amount, total_cash_balance, award_flag, remark, create_time, update_time
+    </sql>
+
+</mapper>

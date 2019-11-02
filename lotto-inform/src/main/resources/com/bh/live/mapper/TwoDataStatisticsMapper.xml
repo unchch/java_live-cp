@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.TwoDataStatisticsDao">
+
+    <select id="queryTwoDataStatistics" resultType="com.bh.live.pojo.res.inform.TwoDataStatisticsRes">
+ SELECT 
+ 		<choose>
+	       <when test='varietyType =="8" or varietyType =="5"'>
+    			SUM(case when ${number} IN(1,2,3,4,5,6,7,8,9,10) then 1 else 0 end) xiao,
+		        SUM(case when ${number} IN(11,12,13,14,15,16,17,18,19,20) then 1 else 0 end) da,
+		        SUM(case when ${number} IN(1,3,5,7,9,11,13,15,17,19) then 1 else 0 end )dan,
+		        SUM(case when ${number} IN(2,4,6,8,10,12,14,16,18,20) then 1 else 0 end) suan,
+	       </when>
+	       <when test='varietyType =="2" or varietyType =="3" or varietyType =="7" or varietyType =="10"'>
+	       		SUM(case when ${number} IN(1,2,3,4,0) then 1 else 0 end )xiao,
+		        SUM(case when ${number} IN(6,7,8,9,5) then 1 else 0 end) da,
+		        SUM(case when ${number} IN(1,3,5,7,9) then 1 else 0 end) dan,
+		        SUM(case when ${number} IN(2,4,6,8,0) then 1 else 0 end) suan,
+	       </when>
+	       <otherwise>
+	       		SUM(case when ${number} IN(1,2,3,4,5) then 1 else 0 end) xiao,
+		        SUM(case when ${number} IN(6,7,8,9,10) then 1 else 0 end) da,
+		        SUM(case when ${number} IN(1,3,5,7,9) then 1 else 0 end) dan,
+		        SUM(case when ${number} IN(2,4,6,8,10) then 1 else 0 end) suan,
+	       </otherwise>
+	    </choose>
+	MAX(expect) maxExpect, min(expect)minExpect ,MAX(open_time) openTime FROM
+	t_variety_current  where variety_type =#{varietyType}  and DATEDIFF(open_time,NOW())= #{time}   GROUP BY expect order by expect asc 
+    </select>
+
+    <!-- 大数据遗漏 -->
+    <select id="queryMissingBigData" resultType="com.bh.live.pojo.res.inform.DragonRes">
+    	select ld_period,sum(frequency) frequency,ld_type from dragon where rank_name =#{index}  and open_date &gt;= #{startDate}  and open_date &lt;= #{endDate}  GROUP BY ld_period,ld_type;
+    </select>
+    <select id="queryMissingBigOneData" parameterType="com.bh.live.pojo.req.inform.DewDropReq"
+            resultType="com.bh.live.pojo.res.inform.TwoDataStatisticsRes">
+    	SELECT expect,
+    	<choose>
+	       <when test='dto.varietyType =="8" or dto.varietyType =="5"'>
+	       		case when ${dto.field} IN(1,2,3,4,5,6,7,8,9,10) then '小' else '大' end bigSmall,
+    			case when ${dto.field}  IN(1,3,5,7,9,11,13,15,17,19) then '单' else '双' end singleDouble
+	       </when>
+	       <when test='dto.varietyType =="2" or dto.varietyType =="3" or dto.varietyType =="7" or dto.varietyType =="10"'>
+		        case when ${dto.field} IN(1,2,3,4,0) then '小' else '大' end bigSmall,
+     			case when ${dto.field}  IN(1,3,5,7,9) then '单' else '双' end singleDouble
+	       </when>
+	       <otherwise>
+	       		case when ${dto.field} IN(1,2,3,4,5) then '小' else '大' end bigSmall,
+     			case when ${dto.field}  IN(1,3,5,7,9) then '单' else '双' end singleDouble
+	       </otherwise>
+	    </choose>
+      <if test="dto.paream != null and dto.paream != ''">
+				 ,case when ${dto.paream} IN('龙') then '龙' else '虎' end dragonTiger
+		</if>
+ from t_variety_current t where variety_type =#{dto.varietyType} and open_time &gt;= #{dto.startDate}  and open_time &lt;= #{dto.endDate}  
+ 
+ union
+ 
+ SELECT expect,
+		<choose>
+	       <when test='dto.varietyType =="8" or dto.varietyType =="5"'>
+	       		case when ${dto.field} IN(1,2,3,4,5,6,7,8,9,10) then '小' else '大' end bigSmall,
+    			case when ${dto.field}  IN(1,3,5,7,9,11,13,15,17,19) then '单' else '双' end singleDouble
+	       </when>
+	       <when test='dto.varietyType =="2" or dto.varietyType =="3" or dto.varietyType =="7" or dto.varietyType =="10"'>
+		        case when ${dto.field} IN(1,2,3,4,0) then '小' else '大' end bigSmall,
+     			case when ${dto.field}  IN(1,3,5,7,9) then '单' else '双' end singleDouble
+	       </when>
+	       <otherwise>
+	       		case when ${dto.field} IN(1,2,3,4,5) then '小' else '大' end bigSmall,
+     			case when ${dto.field}  IN(1,3,5,7,9) then '单' else '双' end singleDouble
+	       </otherwise>
+	    </choose>
+     <if test="dto.paream != null and dto.paream != ''">
+		,case when ${dto.paream} IN('龙') then '龙' else '虎' end dragonTiger
+	</if>
+ from t_variety_history t where variety_type =#{dto.varietyType} and open_time &gt;= #{dto.startDate}  and open_time &lt;= #{dto.endDate} 
+ 
+ ORDER BY expect asc
+    </select>
+
+</mapper>

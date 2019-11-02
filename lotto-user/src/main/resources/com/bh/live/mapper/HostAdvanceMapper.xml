@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.HostAdvanceDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.bh.live.model.anchor.HostAdvance">
+        <id column="id" property="id"/>
+        <result column="host_id" property="hostId"/>
+        <result column="seed_no" property="seedNo"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="creat_time" property="creatTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_usable" property="isUsable"/>
+        <result column="live_period" property="livePeriod"/>
+        <result column="live_date" property="liveDate"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, host_id, seed_no, start_time, end_time, creat_time,
+		update_time,
+		is_usable, live_period, live_date
+	</sql>
+
+    <!-- 根据用户id查询主播信息 -->
+    <select id="queryHostUserById"
+            resultType="com.bh.live.model.anchor.HostUser">
+		SELECT
+		user_id,
+		room_id,
+		age,
+		age_limit,
+		adept_lottery,
+		experience,
+		pc_version,
+		host_lv,
+		create_time,
+		update_time,
+		is_usable,
+		cover,
+		gallery,
+		personal_profile,
+		icon,
+		device,
+		invite_code,
+		phone_login,
+		verify_time,
+		verify_status,
+		settlement_type,
+		st_value,
+		settlement_cycle,
+		status,
+		recomm_home_page,
+		sort,
+		hot_val
+		FROM lotto_host_user
+		WHERE
+		user_id=#{hostId}
+	</select>
+
+    <!-- 根据主播id查询房间信息 -->
+    <select id="queryHostRoomById"
+            resultType="com.bh.live.model.anchor.HostRoom">
+		SELECT
+		id,
+		host_id,
+		name,
+		room_describe,
+		prevue,
+		label,
+		create_time,
+		open_time,
+		end_time,
+		is_usable,
+		lotto_id,
+		lotto_name,
+		status,
+		line_persons,
+		nickname,
+		recomm_home_page,
+		sort,
+		kick_off_line,
+		y_live_time
+		FROM lotto_host_room
+		WHERE host_id=#{hostId}
+	</select>
+
+	<select id="queryHostUserRecommend"
+			resultType="com.bh.live.pojo.res.anchor.HostAdvanceRes">
+		SELECT
+		t1.room_id AS roomId,
+		t1.user_id AS hostId,
+		t1.icon AS hostIcon,
+		t5.status AS hostStatus,
+		t1.host_lv AS hotVal,
+		t2.nickname AS nickname,
+		IFNULL(t4.is_attent,0) isAttend,
+		t1.cover,
+		t5.lotto_id AS seedNo,
+		t5.lotto_name AS seedName
+		FROM
+		lotto_host_user t1
+		INNER JOIN lotto_live_user t2
+		ON t1.user_id = t2.id
+		LEFT JOIN lotto_attention t4
+		ON t4.target_id = t1.user_id
+		AND t4.user_id = #{curUserId}
+		LEFT JOIN lotto_host_room t5
+		ON t5.host_id=t1.user_id
+		WHERE t1.is_usable = 1
+		AND t2.is_usable = 1
+		AND t1.recomm_home_page=1
+		ORDER BY t1.sort ASC
+		<if test="size!=null">
+			LIMIT 0, ${size}
+		</if>
+
+	</select>
+
+    <select id="queryLiveUserById"
+            resultType="com.bh.live.model.user.LiveUser">
+		SELECT
+		id,
+		nickname,
+		image_url,
+		mobile,
+		sex,
+		user_grade,
+		terminal,
+		is_usable,
+		is_online,
+		is_login,
+		is_publish,
+		is_speak,
+		lastlogin,
+		lastip,
+		update_time,
+		channel,
+		creat_time,
+		is_expert,
+		is_anchor
+		FROM
+		lotto_live_user
+		WHERE id=#{userId}
+	</select>
+
+    <select id="queryHostAdvances"
+            resultType="com.bh.live.pojo.res.anchor.HostAdvanceRes">
+		select lhu.username,lhu.status,lha.start_time,lha.end_time
+		from lotto_host_advance lha left join
+		lotto_host_user lhu on
+		lha.host_id=lhu.user_id where lha.is_usable=1 and
+		lha.seed_no=#{seedNo}
+		order by lha.start_time desc
+	</select>
+
+    <select id="queryHostRoomListBySize"
+            resultType="com.bh.live.pojo.res.anchor.RecomHostRoomRes">
+		SELECT 
+		  t1.id AS roomId,
+		  t1.lotto_name AS lottoName,
+		  t1.lotto_id AS lottoId,
+		  t1.status,
+		  t2.cover,
+		  t2.host_lv AS hotVal,
+		  t2.user_id AS hostId,
+		  t2.icon AS imageUrl,
+		  t3.nickname,
+		  IFNULL(t4.is_attent,0) isAttend
+		FROM
+		  lotto_host_room t1 
+		  INNER JOIN lotto_host_user t2 
+		    ON t1.host_id = t2.user_id 
+		  INNER JOIN lotto_live_user t3 
+		    ON t1.host_id = t3.id 
+		  LEFT JOIN lotto_attention t4 
+		    ON t4.target_id = t1.host_id 
+		    AND t4.user_id = #{curUserId}
+		WHERE t3.is_usable = 1
+		AND t1.recomm_home_page=1
+		ORDER BY t1.sort ASC 
+		LIMIT 0,${size}
+	</select>
+
+    <select id="queryHostAdvancesByUserId"
+            resultType="com.bh.live.pojo.res.anchor.HostUserLiveSeedAdvanceRes">
+		select lha.start_time,lha.end_time,lha.seed_no,ls.seed_name from lotto_host_advance lha left join
+		lotto_seed ls on lha.seed_no=ls.seed_no
+		where lha.is_using=1 and lha.is_usable=1 and lha.host_id=#{userId}
+		order by lha.start_time desc
+	</select>
+
+    <select id="querySearchLiveUserInfo" resultType="com.bh.live.pojo.res.rankingList.SearchLiveUserRes">
+        SELECT
+        t1.nickname,
+        t1.image_url,
+        t1.id,
+        t2.room_id,
+        t2.host_lv,
+        IFNULL(t3.attNum, 0) attNum,
+        IFNULL(t4.pv, 0) profitrateValue,
+        IFNULL(t4.wv, 0) winrateValue,
+		IFNULL(t5.is_attent,0)  isAttent
+        FROM
+        lotto_live_user t1
+        INNER JOIN lotto_host_user t2
+        ON t1.id = t2.user_id
+        LEFT JOIN
+        (SELECT
+        COUNT(id) attNum,
+        target_id
+        FROM
+        lotto_attention
+        WHERE is_attent = 1
+        GROUP BY target_id) t3
+        ON t3.target_id = t1.id
+        LEFT JOIN
+        (SELECT
+        SUM(profit_rate) pv,
+        CASE
+        WHEN award_state = 1
+        THEN COUNT(order_no)
+        END / COUNT(order_no) wv,
+        account_id
+        FROM
+        lotto_order
+        GROUP BY account_id) t4
+        ON t4.account_id = t1.id
+		LEFT JOIN lotto_attention t5 ON t5.target_id=t1.id AND t5.user_id= #{userId}
+        WHERE t1.is_usable = 1
+        AND t2.is_usable = 1
+        <if test="content!=null and content!='' ">AND INSTR(t1.nickname,#{content})</if>
+        <if test='userType=="0"'>AND is_expert=1</if>
+        <if test='userType=="1"'>AND is_anchor=1</if>
+        ORDER BY
+        <if test='userType=="0"'>t2.status DESC,t2.host_lv DESC,</if>
+        <if test='userType=="1"'>profitrateValue DESC,winrateValue DESC,</if>
+        t1.update_time DESC
+    </select>
+
+    <select id="queryHostAdvanceResList" resultType="com.bh.live.pojo.res.anchor.HostAdvanceRes">
+        SELECT
+        t1.id,
+        t1.host_id AS hostId,
+        t1.live_date AS advanceTime,
+        t1.seed_no AS seedNo,
+        t1.start_time AS startTime,
+        t1.end_time AS endTime,
+        t1.creat_time AS creatTime,
+        t1.update_time AS updateTime,
+        t1.is_usable AS isUsable,
+        t1.live_period AS livePeriod,
+        t1.is_using,
+        t2.icon AS hostIcon,
+        t2.status AS hostStatus,
+        t2.host_lv AS hotVal,
+        t2.room_id AS roomId,
+        t3.nickname AS nickname,
+        t4.seed_name AS seedName
+        FROM
+        lotto_host_advance t1
+        LEFT JOIN lotto_host_user t2
+        ON t1.host_id = t2.user_id
+        LEFT JOIN lotto_live_user t3
+        ON t1.host_id = t3.id
+        LEFT JOIN lotto_seed t4
+        ON t4.seed_no= t1.seed_no
+        WHERE (
+        (
+        INSTR(t1.live_date, #{liveDate})
+        AND t1.start_time > #{startTime}
+        AND t1.live_period = 0
+        )
+        OR (
+		t1.live_date >= #{startTime} AND #{endTime} > t1.live_date
+        AND t1.live_period = 1
+        )
+        )
+        AND t1.is_using = 1
+        <if test="seedNo != null and seedNo != ''">
+            AND t1.seed_no=#{seedNo}
+        </if>
+        <if test="hostId != null and hostId != ''">
+            and t1.host_id = #{hostId}
+        </if>
+    </select>
+
+    <select id="queryAdvanceByHostId" resultType="com.bh.live.pojo.res.anchor.HostAdvanceRes">
+		SELECT
+		  t1.id,
+		  t1.host_id,
+		  t1.live_date,
+		  t1.seed_no,
+		  t1.start_time,
+		  t1.end_time,
+		  t1.creat_time,
+		  t1.update_time,
+		  t1.is_usable,
+		  t1.live_period,
+		  t1.is_using,
+		  t2.icon,
+		  t2.status,
+		  t2.host_lv,
+		  t3.nickname,
+		  t2.room_id,
+		  t4.seed_name
+		FROM
+		  lotto_host_advance t1
+		  LEFT JOIN lotto_host_user t2
+			ON t1.host_id = t2.user_id
+		  LEFT JOIN lotto_live_user t3
+			ON t1.host_id = t3.id
+		  LEFT JOIN lotto_seed t4
+			ON t4.seed_no = t1.seed_no
+		WHERE t1.host_id=#{hostId}
+		AND  t1.is_usable=1
+	</select>
+
+	<select id="queryLiveHostStateById" resultType="com.bh.live.pojo.res.user.LiveHostStateRes">
+		SELECT
+		  t2.status,
+		  t2.host_id,
+		  t2.id AS room_id
+		FROM
+		  lotto_host_user t1
+		  INNER JOIN lotto_host_room t2
+			ON t1.user_id = t2.host_id
+		WHERE t1.user_id = #{hostId}
+	</select>
+</mapper>

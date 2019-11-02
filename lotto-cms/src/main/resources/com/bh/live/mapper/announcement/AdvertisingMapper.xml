@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.announcement.AdvertisingDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.announcement.Advertising">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="describes" property="describes" />
+        <result column="internal_chain" property="internalChain" />
+        <result column="other_chain" property="otherChain" />
+        <result column="terrace" property="terrace" />
+        <result column="is_release" property="isRelease" />
+        <result column="img" property="img" />
+        <result column="creation_time" property="creationTime" />
+        <result column="valid_time" property="validTime" />
+        <result column="modification_time" property="modificationTime" />
+        <result column="plan_up_time" property="planUpTime" />
+        <result column="plan_down_time" property="planDownTime" />
+        <result column="title" property="title" />
+        <result column="sort" property="sort" />
+        <result column="author" property="author" />
+        <result column="modify" property="modify" />
+        <result column="is_recommend" property="isRecommend" />
+        <result column="is_chain" property="isChain" />
+        <result column="internal_chain_type" property="internalChainType" />
+        <result column="advertising_serial" property="advertisingSerial" />
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,advertising_serial, is_chain,name,internal_chain_type, describes, internal_chain, other_chain, terrace, is_release, img, creation_time, valid_time, modification_time, plan_up_time, plan_down_time, title, sort, author, modify,is_recommend
+    </sql>
+    <select id="queryAdvertisList" parameterType="com.bh.live.pojo.req.cms.AdvertisingReq" resultType="com.bh.live.model.announcement.Advertising">
+        select id,name,describes,internal_chain,other_chain,terrace,sort,is_release,img,creation_time,plan_up_time,plan_down_time from lotto_advertising where status!=0
+         <if test="advertisingReq.id != '' and advertisingReq.id != null ">
+            and id like #{advertisingReq.id}
+        </if>
+        <if test="advertisingReq.name != '' and advertisingReq.name != null ">
+            and name like #{advertisingReq.name}
+        </if>
+        <if test="advertisingReq.isRelease != '' and advertisingReq.isRelease != null ">
+            and is_release = #{advertisingReq.isRelease}
+        </if>
+        <if test="advertisingReq.terrace != '' and advertisingReq.terrace != null ">
+            and terrace = #{advertisingReq.terrace}
+        </if>
+        <if test="advertisingReq.startDate != '' and advertisingReq.startDate != null ">
+            and terrace &lt;= #{advertisingReq.startDate}
+        </if>
+        <if test="advertisingReq.endDate != '' and advertisingReq.endDate != null ">
+            and terrace &gt;= #{advertisingReq.endDate}
+        </if>
+        order by  sort desc
+    </select>
+</mapper>

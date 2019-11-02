@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.RankingListDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.bh.live.model.rankingList.RankingList">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="user_type" property="userType" />
+		<result column="popularity_value" property="popularityValue" />
+		<result column="treasure_value" property="treasureValue" />
+		<result column="winging_value" property="wingingValue" />
+		<result column="winrate_value" property="winrateValue" />
+		<result column="profitrate_value" property="profitrateValue" />
+		<result column="rank_period" property="rankPeriod" />
+		<result column="is_usable" property="isUsable" />
+		<result column="update_time" property="updateTime" />
+		<result column="creat_time" property="creatTime" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, user_id, popularity_value, treasure_value,
+		winging_value,
+		winrate_value, profitrate_value, rank_period, is_usable,
+		update_time,
+		creat_time
+	</sql>
+
+	<select id="queryRankingCountByPeriod" resultType="Integer">
+		SELECT
+		count(id)
+		FROM lotto_ranking_list
+		WHERE rank_period=#{rankPeriod}
+		AND
+		user_type=#{userType}
+		AND is_usable=1
+	</select>
+
+	<select id="queryRankingListByPeriod"
+		resultType="com.bh.live.pojo.res.rankingList.RankingListRes">
+		SELECT
+		t1.id,
+		t1.user_id,
+		t1.popularity_value,
+		t1.treasure_value,
+		t1.winging_value,
+		t1.winrate_value,
+		t1.profitrate_value,
+		t1.rank_period,
+		t1.is_usable,
+		t1.update_time,
+		t1.creat_time,
+		t1.number_of,
+		t2.nickname,
+		CASE t1.user_type WHEN '2' THEN t3.icon ELSE t2.image_url END image_url,
+		t2.user_grade,
+		t3.room_id roomid,
+		IFNULL(t3.status,0) hostsStatus
+		FROM
+		lotto_ranking_list t1
+		LEFT JOIN lotto_live_user t2
+		ON t1.user_id = t2.id
+		LEFT JOIN lotto_host_user t3
+		ON t2.id=t3.user_id
+		WHERE t1.rank_period = #{rankPeriod}
+		AND t1.user_type = #{userType}
+		AND t1.is_usable = 1
+		ORDER BY
+		<choose>
+			<!-- 排行类型 0人气 1财富 2连胜 3胜率 4盈利率值 -->
+			<when test=' rankType=="0" '>t1.popularity_value</when>
+			<when test=' rankType=="1" '>t1.treasure_value</when>
+			<when test=' rankType=="2" '>t1.winging_value</when>
+			<when test=' rankType=="3" '>t1.winrate_value</when>
+			<when test=' rankType=="4" '>t1.profitrate_value</when>
+			<otherwise>t1.update_time</otherwise>
+		</choose>
+		DESC limit #{size}
+	</select>
+
+</mapper>

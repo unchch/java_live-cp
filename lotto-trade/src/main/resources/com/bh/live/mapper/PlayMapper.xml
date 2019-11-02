@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.PlayDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.lottery.Play">
+        <id column="id" property="id" />
+        <result column="play_no" property="playNo" />
+        <result column="seed_no" property="seedNo" />
+        <result column="play_mode" property="playMode" />
+        <result column="parent_no" property="parentNo" />
+        <result column="play_type" property="playType" />
+        <result column="play_name" property="playName" />
+        <result column="sort" property="sort" />
+        <result column="explain_example" property="explainExample" />
+        <result column="explain_help" property="explainHelp" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, play_no, seed_no, play_mode, parent_no, play_type, play_name, sort, explain_example, explain_help, status
+    </sql>
+
+    <select id="selectPlayRes" resultType="com.bh.live.pojo.res.trade.PlayTabRes">
+        select play_no, seed_no, play_mode, parent_no, play_type, play_name, sort
+        from lotto_play
+        where status=1 and seed_no=#{seedNo}
+        order by sort asc
+    </select>
+
+</mapper>

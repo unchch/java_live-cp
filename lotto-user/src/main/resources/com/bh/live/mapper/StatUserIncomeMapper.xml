@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.StatUserIncomeDao">
+
+    <select id="giftIncomeList" resultType="com.bh.live.pojo.res.user.GiftListIncomeRes">
+        select t.create_time,category_id,lu.nickname,t.gift_num,t.amount,lg.gift_name,
+        b.divide,(t.amount*b.divide) income from lotto_trade_user_award t
+        LEFT JOIN ( SELECT u.id, ( SELECT divide_into FROM lotto_grade_divide_into
+        WHERE u.user_grade BETWEEN min_lv AND max_lv ) divide FROM lotto_live_user u ) b ON t.tv_user_id = b.id
+        left join lotto_gift lg on t.gift_id= lg.id
+        left join lotto_live_user lu on lu.id=t.user_id
+        where t.tv_user_id=#{params.userId}
+        <if test="params.begin != null and params.begin != '' and params.end != null and params.end != ''">
+            and t.create_time between #{params.begin} and #{params.end}
+        </if>
+    </select>
+</mapper>

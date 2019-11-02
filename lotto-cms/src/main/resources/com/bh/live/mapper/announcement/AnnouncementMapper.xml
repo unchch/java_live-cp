@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.announcement.AnnouncementDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.announcement.Announcement">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="title" property="title" />
+        <result column="release_time" property="releaseTime" />
+        <result column="terrace" property="terrace" />
+        <result column="status" property="status" />
+        <result column="is_stick" property="isStick" />
+        <result column="is_hot" property="isHot" />
+        <result column="sort" property="sort" />
+        <result column="author" property="author" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="content" property="content" jdbcType="BLOB"/>
+        <result column="modify" property="modify" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, type, title, release_time, terrace, status, is_stick, is_hot, sort, author, modify_time, content, modify, remark
+    </sql>
+    <select id="queryAnnouncementList" parameterType="com.bh.live.model.announcement.Announcement" resultType="com.bh.live.pojo.req.cms.AnnouncementReq">
+        select id,type,title, release_time,terrace,status,is_stick,is_hot,sort,content from lotto_announcement where status!=0
+        <if test="announcementReq.title != '' and announcementReq.title != null ">
+            and title like #{announcementReq.title}
+        </if>
+        <if test="announcementReq.type != '' and announcementReq.type != null ">
+            and type = #{announcementReq.type}
+        </if>
+        <if test="announcementReq.startDate != '' and announcementReq.startDate != null ">
+            and release_time &lt;= #{announcementReq.startDate}
+        </if>
+        <if test="announcementReq.endDate != '' and announcementReq.endDate != null ">
+            and release_time &gt;= #{announcementReq.endDate}
+        </if>
+        order by is_stick,is_hot, sort desc
+    </select>
+    
+    <select id="getUpOrDown" resultType="com.bh.live.model.announcement.Announcement" >
+    	
+    </select>
+</mapper>

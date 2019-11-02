@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.lottery.config.DictDao">
+
+<select id="selectByParam" parameterType="com.bh.live.pojo.req.lottery.config.DictReq" resultType="com.bh.live.pojo.res.lottery.config.DictRes">
+    select id,type_code,dict_name,dict_value,is_disabled,fixed,is_disabled,create_time,update_time,sort from lotto_dict where 1=1
+    <if test="param.id != null and param.id != ''">
+        AND id = ${param.id}
+    </if>
+    <if test="param.typeCode != null and param.typeCode != ''">
+        AND type_code = ${param.typeCode}
+    </if>
+    <if test="param.dictName != null and param.dictName != ''">
+        AND dict_name = ${param.dictName}
+    </if>
+    order by sort,create_time
+</select>
+
+    <select id="selectByTypeCodes" parameterType="java.lang.String" resultType="com.bh.live.pojo.res.lottery.config.DictRes">
+        select id,type_code,dict_name,dict_value,is_disabled,fixed,is_disabled,create_time,update_time,sort
+        from lotto_dict where type_code in (${typeCodes}) order by sort,create_time
+    </select>
+</mapper>

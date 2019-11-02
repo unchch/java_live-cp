@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.NoTalkDao">
+
+    <select id="getNoTalkList" resultType="com.bh.live.pojo.res.anchor.NoTalkRes">
+        SELECT lnk.*,u.nickname,lg.lv_image,lnk.remark from lotto_no_talk lnk
+        left join lotto_live_user u on u.id=lnk.user_id
+        left join lotto_grade lg on lg.lv_name=lnk.user_level
+        where 1=1 and lnk.host_user_id=#{userId}
+        <!--区分查询类型-->
+        <if test="queryType != null and queryType != ''">
+            <choose>
+                <!--查询类型为解禁时-->
+                <when test="queryType == 'undo'">
+                    <!--只查询用户昵称条件-->
+                    <if test="nickname != null and nickname != ''">
+                        and u.nickname like concat('%',concat(#{nickname},'%'))
+                    </if>
+                    and lnk.status = 1
+                </when>
+                <!--否则查询类型区分用户还是ip-->
+                <otherwise>
+                    <choose>
+                        <when test="queryType == 'user'">
+                            <!--只查询用户昵称条件-->
+                            <if test="nickname != null and nickname != ''">
+                                and u.nickname like concat('%',concat(#{nickname},'%'))
+                            </if>
+                            and lnk.type = 1 and lnk.status = 0
+                        </when>
+                        <when test="queryType == 'IP'">
+                            and lnk.type = 2 and lnk.status = 0
+                        </when>
+                    </choose>
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+</mapper>

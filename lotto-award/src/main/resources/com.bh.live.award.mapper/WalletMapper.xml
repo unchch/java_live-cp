@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.award.dao.WalletDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.trade.Wallet">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="depositl_money" property="depositlMoney" />
+        <result column="notdepositl_money" property="notdepositlMoney" />
+        <result column="all_money" property="allMoney" />
+        <result column="is_extract" property="isExtract" />
+        <result column="is_freeze" property="isFreeze" />
+        <result column="freeze_reason" property="freezeReason" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, depositl_money, notdepositl_money, all_money, is_extract, is_freeze, freeze_reason
+    </sql>
+
+</mapper>

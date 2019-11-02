@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.user.LiveUserDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.bh.live.model.user.LiveUser">
+		<id column="id" property="id" />
+		<!-- <result column="user_type" property="userType" /> -->
+		<result column="nickname" property="nickname" />
+		<result column="image_url" property="imageUrl" />
+		<result column="mobile" property="mobile" />
+		<result column="PASSWORD" property="password" />
+		<result column="sex" property="sex" />
+		<result column="user_grade" property="userGrade" />
+		<result column="terminal" property="terminal" />
+		<result column="is_usable" property="isUsable" />
+		<result column="is_online" property="isOnline" />
+		<result column="is_login" property="isLogin" />
+		<result column="is_publish" property="isPublish" />
+		<result column="is_speak" property="isSpeak" />
+		<result column="lastlogin" property="lastlogin" />
+		<result column="lastip" property="lastip" />
+		<result column="update_time" property="updateTime" />
+		<result column="channel" property="channel" />
+		<result column="creat_time" property="creatTime" />
+		<result column="is_expert" property="isExpert" />
+		<result column="is_anchor" property="isAnchor" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id,is_expert,is_anchor, nickname, image_url, mobile, PASSWORD, sex, user_grade, terminal,
+		is_usable, is_online, is_login, is_publish, is_speak, lastlogin,
+		lastip, update_time, channel, creat_time
+	</sql>
+
+	<!-- 强制下线 -->
+	<insert id="addUserLeave">
+		INSERT INTO lotto_user_leave (user_id,
+		live_time)
+		VALUES(#{userId}, #{liveTime}) ;
+	</insert>
+
+	<select id="queryUserStatisticsById"
+		resultType="com.bh.live.model.user.UserStatistics">
+		SELECT
+		lw.all_money AS maneyQuantity,
+		CASE
+		WHEN lba.account_type = 0
+		THEN lba.account
+		END vxAccount,
+		CASE
+		WHEN lba.account_type = 1
+		THEN lba.account
+		END zfbAccount,
+		CASE
+		WHEN lba.account_type = 2
+		THEN lba.account
+		END openAccount,
+		CASE
+		WHEN lba.account_type = 3
+		THEN lba.account
+		END wbAccount,
+		lba.bank_name AS bankName,
+		lba.bank_name_branch AS bankNameBranch,
+		lba.account_by AS accountBy,
+	    (SELECT COUNT(id) FROM lotto_attention WHERE user_id = #{userId} AND is_attent = 1 ) AS attendQuantity,
+	    (SELECT COUNT(id) FROM lotto_attention WHERE target_id = #{userId} AND is_attent = 1 ) AS fansQuantity,
+	    (SELECT COUNT(id) FROM lotto_order WHERE account_id = #{userId}) AS publishQuantity,
+		lur.ten_profit_rate AS tenEarningsYield,
+		lur.ten_win_rate AS tenWinRate,
+		lur.join_win_lost AS winningOrLose,
+		lur.win_lost_flag AS winLostFlag,
+		SUM(
+		CASE
+		WHEN lrru.trans_type = 1
+		THEN trans_amount
+		END
+		) monthRecharge,
+		SUM(
+		CASE
+		WHEN lrru.trans_type = 2
+		THEN trans_amount
+		END
+		) monthReward,
+		SUM(
+		CASE
+		WHEN lrru.trans_type = 2
+		OR lrru.trans_type = 6
+		THEN trans_amount
+		END
+		) monthExpense ,
+		lw.is_extract AS isExtract,
+		lw.is_freeze AS isFreeze,
+		llu.is_expert,
+		llu.is_anchor
+		FROM
+		lotto_live_user llu
+		INNER JOIN lotto_wallet lw
+		ON llu.id = lw.user_id
+		LEFT JOIN lotto_binding_account lba
+		ON llu.id = lba.user_id
+		AND lba.is_delete = 1
+		AND lba.is_usable = 1
+		LEFT JOIN lotto_user_record lur
+		ON lur.user_id = llu.id
+		LEFT JOIN lotto_trade_trans_user lrru
+		ON lrru.user_id = llu.id
+		AND lrru.create_time <![CDATA[ >= ]]>
+		DATE_ADD(NOW(), INTERVAL - 1 MONTH)
+		AND lrru.create_time <![CDATA[ <= ]]>
+		NOW()
+		WHERE llu.id=#{userId}
+	</select>
+	
+	<select id="queryAllMoney" resultType="Double" >
+		SELECT 
+		  SUM(t2.all_money) allMoney 
+		FROM
+		  lotto_live_user t1 
+		  INNER JOIN lotto_wallet t2
+		    ON t1.id = t2.user_id 
+		WHERE t1.is_usable=1
+	</select>
+	
+</mapper>

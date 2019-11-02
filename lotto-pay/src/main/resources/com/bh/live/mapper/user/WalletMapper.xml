@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.user.WalletDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.Wallet">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="depositl_money" property="depositlMoney" />
+        <result column="notdepositl_money" property="notdepositlMoney" />
+        <result column="all_money" property="allMoney" />
+        <result column="is_extract" property="isExtract" />
+        <result column="is_freeze" property="isFreeze" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, depositl_money, notdepositl_money, all_money, is_extract, is_freeze
+    </sql>
+    <select id="queryLoginSuccessfulStatus" resultType="com.bh.live.pojo.res.user.LoginSuccessfulStatus" parameterType="com.bh.live.model.user.LiveUser">
+        SELECT s.user_id,s.attend_num,s.fans_num,w.all_money,w.notdepositl_money FROM lotto_statistics s LEFT JOIN lotto_wallet w on s.user_id = w.user_id where s.user_id=#{user.id}
+    </select>
+</mapper>

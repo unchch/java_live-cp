@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.StatValueInvestDao">
+
+    <select id="queryValueInvest" resultType="string">
+		SELECT CONCAT(O.count,",",E.count) FROM
+		(SELECT COUNT(1) as count FROM
+		(
+		SELECT expect,open_code,${param.number} FROM t_variety_current
+		 where  variety_type = ${param.variety}
+		ORDER BY expect DESC LIMIT ${param.count}
+		) as A
+		WHERE A.${param.number} ${param.conditionOne}) as O
+		,
+		(SELECT COUNT(1) as count  FROM
+		(
+		SELECT expect,open_code,${param.number} FROM t_variety_current
+		 where  variety_type = ${param.variety}
+		ORDER BY expect DESC LIMIT ${param.count}
+		) as A
+		WHERE A.${param.number} ${param.conditionTwo}) as E
+    </select>
+    <select id="queryOptionalCount" resultType="java.lang.String">
+        SELECT CONCAT
+        <foreach collection="param.list" item="i" index="index" open="(" close=")" separator=",">
+            c${index}.count,","
+        </foreach>
+        as allCount FROM
+        <foreach collection="param.list" item="i" index="index" separator=",">
+            ( SELECT COUNT(1) as count
+            FROM
+            (
+            SELECT
+            expect,
+            open_code,
+            ${param.number}
+            FROM
+            t_variety_current
+            where variety_type = ${param.variety}
+            ORDER BY
+            expect DESC
+            LIMIT ${param.count} ) as A
+            WHERE
+            <if test="param.ids==null">
+                A.${param.number} = ${i}
+            </if>
+            <if test="param.ids!=null">
+                <foreach collection="param.ids" separator="or" item="j">
+                    A.${param.number} = ${j}
+                </foreach>
+            </if>
+            ) as c${index}
+        </foreach>
+    </select>
+    <select id="queryOmit" resultType="com.bh.live.pojo.res.inform.OmitRes">
+        select
+        rowNo,
+        expect
+        from
+        (
+        Select
+        (@rowNum := @rowNum + 1) as rowNo,
+        id,
+        expect,
+        ${param.number}
+        From
+        t_variety_current a,
+        (
+        Select (@rowNum := 0) ) b
+        where variety_type = ${param.variety}
+        <if test="param.isToday==1">
+            AND DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+        </if>
+        Order by
+        expect Desc
+        <if test="param.isToday==2">
+            LIMIT ${param.count}
+        </if>
+        ) c
+        where
+        ${param.number} ${param.condition}
+        order by
+        expect desc
+    </select>
+    <select id="queryResult" resultType="com.bh.live.pojo.res.inform.ColorVarietyModelRes">
+        SELECT
+        expect,open_code,variety_type,
+        number_one_ball,number_two_ball,number_three_ball,number_four_ball,number_five_ball,
+        number_six_ball,number_seven_ball,number_eight_ball,number_nine_ball,number_ten_ball,crown_sub,
+        first_dragon_tiger,second_dragon_tiger,third_dragon_tiger,fourth_dragon_tiger,fifth_dragon_tiger
+        FROM
+          t_variety_current
+            where  variety_type = ${variety}
+        ORDER BY
+        expect DESC
+        LIMIT ${count }
+    </select>
+
+</mapper>

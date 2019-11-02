@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.lottery.SeedDao">
+
+    <!-- 彩种列表 -->
+    <select id="selectSeedPage"
+            parameterType="com.bh.live.pojo.req.lottery.SeedReq"
+            resultType="com.bh.live.pojo.res.lottery.SeedPageRes">
+        SELECT
+            s.seed_no, s.seed_name, s.category_no, c.category_name,
+            s.cover_pc_icon, s.logo_pc_icon, s.show_able, s.show_home_page, s.sale_state,
+            s.play_mode_recommend, s.official_play_no, s.official_play_recommend, s.credit_play_no, s.credit_play_recommend
+        FROM lotto_seed AS s
+        LEFT JOIN lotto_seed_category AS c ON c.category_no = s.category_no
+        WHERE 1 = 1
+        <if test="param.categoryNo != null">
+            AND s.category_no = #{param.categoryNo}
+        </if>
+        <if test="param.seedNo != null">
+            AND s.seed_no = #{param.seedNo}
+        </if>
+        ORDER BY c.sort, s.sort
+    </select>
+
+    <!-- 查询彩种信息 -->
+    <select id="selectSeedDetail"
+            parameterType="com.bh.live.pojo.req.lottery.SeedReq"
+            resultType="com.bh.live.pojo.res.lottery.SeedUpdateRes">
+        SELECT
+            s.*,
+            c.category_name
+        FROM lotto_seed AS s
+        LEFT JOIN lotto_seed_category AS c ON c.category_no = s.category_no
+        WHERE s.seed_no = #{req.seedNo}
+    </select>
+
+</mapper>

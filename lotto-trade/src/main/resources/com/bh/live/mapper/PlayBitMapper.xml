@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.PlayBitDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.lottery.PlayBit">
+        <id column="id" property="id" />
+        <result column="bit_no" property="bitNo" />
+        <result column="content" property="content" />
+        <result column="play_no" property="playNo" />
+        <result column="sort" property="sort" />
+        <result column="status" property="status" />
+        <result column="show_bit_name" property="showBitName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, bit_no, content, play_no, sort, status, show_bit_name
+    </sql>
+
+    <select id="selectBitTabRes" resultType="com.bh.live.pojo.res.trade.BitTabRes">
+        select bit_no, content, play_no, sort, show_bit_name
+        from lotto_play_bit
+        where status=1 and play_no=#{playNo}
+        order by sort asc
+    </select>
+
+</mapper>

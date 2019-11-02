@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.AnnouncementDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.announcement.Announcement">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="title" property="title" />
+        <result column="release_time" property="releaseTime" />
+        <result column="terrace" property="terrace" />
+        <result column="status" property="status" />
+        <result column="is_stick" property="isStick" />
+        <result column="is_hot" property="isHot" />
+        <result column="sort" property="sort" />
+        <result column="author" property="author" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="content" property="content" />
+        <result column="modify" property="modify" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, type, title, release_time, terrace, status, is_stick, is_hot, sort, author, modify_time, content, modify, remark
+    </sql>
+
+    <select id="queryUpAnnouncementById" resultType="com.bh.live.pojo.res.cms.AnnouncementRes" >
+        SELECT
+          upTitleId,
+          upTitle
+        FROM
+          (SELECT
+            @lagid AS upTitleId,
+            @lagtitle AS upTitle,
+            @lagtitle := title,
+            @lagid := id,
+            t.id,
+            t.title
+          FROM
+            (SELECT
+              id,
+              title
+            FROM
+              lotto_announcement
+            WHERE STATUS = 1
+            ORDER BY is_hot DESC,
+              is_stick DESC,
+              release_time DESC) t,
+            (SELECT
+              @lagid := '',
+              @lagtitle := '') r) lag
+        WHERE id = #{annId}
+    </select>
+
+    <select id="queryDownAnnouncementById" resultType="com.bh.live.pojo.res.cms.AnnouncementRes" >
+        SELECT
+          downTitleId,
+          downTitle
+        FROM
+          (SELECT
+            @lagid AS id,
+            @lagtitle,
+            @lagtitle := title,
+            @lagid := id,
+            t.id AS downTitleId,
+            t.title AS downTitle
+          FROM
+            (SELECT
+              id,
+              title
+            FROM
+              lotto_announcement
+            WHERE STATUS = 1
+            ORDER BY is_hot DESC,
+              is_stick DESC,
+              release_time DESC) t,
+            (SELECT
+              @lagid := '',
+              @lagtitle := '') r) lag
+        WHERE id = #{annId}
+    </select>
+
+
+</mapper>

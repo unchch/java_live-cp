@@ -1,0 +1,35 @@
+server:
+  port: 9350
+  servlet:
+    context-path: /user
+  connection-timeout: 60000
+
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: lotto-user
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: false
+
+feign:
+  hystrix:
+    enabled: false
+
+#mybatis-plus配置，如果没有这个配置自定义的mapper.xml里面的查询方法会无法绑定到dao
+mybatis-plus:
+  mapper-locations: classpath*:com/bh/live/mapper/*.xml
+
+mybatis:
+  type-handlers-package: com.bh.live.user.utils.live
+
+#聊天室信息推送地址
+chat:
+  remote-address: http://192.168.2.201:7071/
+  #视频流地址
+  rtmp: rtmp://srs.yzkj.net:1935/live/
+
+
+

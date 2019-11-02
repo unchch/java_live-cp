@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.award.dao.PlayBetDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.lottery.PlayBet">
+        <id column="id" property="id" />
+        <result column="item_no" property="itemNo" />
+        <result column="item_name" property="itemName" />
+        <result column="play_no" property="playNo" />
+        <result column="play_name" property="playName" />
+        <result column="seed_no" property="seedNo" />
+        <result column="odds" property="odds" />
+        <result column="each_bet_min" property="eachBetMin" />
+        <result column="each_bet_max" property="eachBetMax" />
+        <result column="each_item_max" property="eachItemMax" />
+        <result column="supreme_award" property="supremeAward" />
+        <result column="status" property="status" />
+        <result column="odds_type" property="oddsType" />
+        <result column="odds_regex" property="oddsRegex" />
+        <result column="bet_order_desc" property="betOrderDesc" />
+        <result column="player_bet_max" property="playerBetMax" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, item_no, item_name, play_no, play_name, seed_no, odds, each_bet_min, each_bet_max, each_item_max, supreme_award, status, odds_type, odds_regex, bet_order_desc, player_bet_max
+    </sql>
+
+</mapper>

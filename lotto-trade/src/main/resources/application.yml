@@ -1,0 +1,31 @@
+server:
+  port: 9320
+  connection-timeout: 60000MS
+  servlet:
+    context-path: /trade
+
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: lotto-trade
+
+#mybatis-plus配置，如果没有这个配置自定义的mapper.xml里面的查询方法会无法绑定到dao
+mybatis-plus:
+  mapper-locations: classpath*:com/bh/live/mapper/*.xml
+
+#注册服务到注册中心
+eureka:
+  instance:
+    prefer-ip-address: true #注册服务的ip
+    lease-renewal-interval-in-seconds: 5      # 心跳时间，即服务续约间隔时间（缺省为30s）
+    lease-expiration-duration-in- : 10  # 发呆时间，即服务续约到期时间（缺省为90s）
+  client:
+    register-with-eureka: true #使用Eureka注册服务
+    fetch-registry: true #在本地缓存注册表
+    service-url:
+      defaultZone: http://localhost:9380/eureka #Eureka服务位置
+    registry-fetch-interval-seconds: 5 #eureka client间隔多久去拉取服务注册信息，默认为30秒
+    healthcheck:
+      enabled: true  # 开启健康检查（依赖spring-boot-starter-actuator）
+

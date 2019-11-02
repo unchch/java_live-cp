@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.StatHistoryDrawDao">
+
+    <select id="queryStatHistoryDraw" parameterType="java.lang.Object"
+            resultType="com.bh.live.model.inform.StatHistoryDraw">
+        SELECT
+        expect,
+        open_time,
+        open_code,
+        variety_type,
+        number_one_ball,
+        number_two_ball,
+        number_three_ball,
+        number_four_ball,
+        number_five_ball,
+        number_six_ball,
+        number_seven_ball,
+        number_eight_ball,
+        number_nine_ball,
+        number_ten_ball,
+        crown_sub,
+        single_double,
+        big_small,
+        reserved_value,
+        first_dragon_tiger,
+        second_dragon_tiger,
+        third_dragon_tiger,
+        fourth_dragon_tiger,
+        fifth_dragon_tiger
+        FROM t_variety_current where variety_type = #{varietyType}
+        <if test="date!='' and varietyType !=7 and varietyType !=3">
+            AND DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(#{date},'%Y-%m-%d') ORDER BY open_time desc
+        </if>
+        <if test="date!='' and (varietyType ==3 or varietyType ==7) ">
+            AND substring(expect,1,8) =  replace(#{date},'-','') ORDER BY open_time desc
+        </if>
+        <if test="date ==''">
+            ORDER BY open_time desc limit 100
+        </if>
+    </select>
+
+    <select id="queryHkHistoryDraw" parameterType="java.util.Map"
+            resultType="com.bh.live.model.inform.StatHistoryDraw">
+        SELECT
+        expect,
+        open_time,
+        open_code,
+        variety_type,
+        number_one_ball,
+        number_two_ball,
+        number_three_ball,
+        number_four_ball,
+        number_five_ball,
+        number_six_ball,
+        number_seven_ball,
+        crown_sub,
+        single_double,
+        big_small
+        FROM t_variety_current where variety_type = #{param.varietyType}
+        <if test=" param.date !='' and param.date != null">
+            AND DATE_FORMAT(open_time,'%Y') = #{param.date}
+        </if>
+       ORDER BY open_time DESC <if test=" param.expect !='' and param.expect !=null"> limit #{param.expect}</if>
+    </select>
+
+    <select id="queryStatHistoryDrawExpect" parameterType="java.lang.Integer" resultType="java.lang.String">
+        SELECT expect FROM t_variety_current
+        where variety_type = #{varietyType}
+        <choose>
+            <when test="expect==1">
+                AND DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') ORDER BY open_time desc
+            </when>
+            <otherwise>
+                ORDER BY open_time desc limit #{expect}
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="queryStatHistoryDrawByCondition" parameterType="java.lang.Integer"
+            resultType="com.bh.live.model.inform.StatHistoryDraw">
+        SELECT
+        expect,
+        open_time,
+        open_code,
+        number_one_ball,
+        number_two_ball,
+        number_three_ball,
+        number_four_ball,
+        number_five_ball,
+        number_six_ball
+        FROM t_variety_current
+        where variety_type = #{varietyType}
+        <choose>
+            <when test="varietyType ==3 or varietyType ==7">
+               AND substring(expect,1,8) = replace(CURDATE(),'-','') ORDER BY open_time desc
+            </when>
+            <otherwise>
+               AND DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')  ORDER BY open_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="queryTodayStatistics" parameterType="java.util.Map"
+            resultType="java.util.Map">
+		SELECT
+		 SUM(case when number_one_ball IN(1,2,3,4,5) then 1 else 0 end) oneSmall,
+         SUM(case when number_one_ball IN(6,7,8,9,10) then 1 else 0 end) oneBig,
+         SUM(case when number_one_ball IN(1,3,5,7,9) then 1 else 0 end) oneSingle,
+         SUM(case when number_one_ball IN(2,4,6,8,10) then 1 else 0 end) oneDouble,
+		 SUM(case when number_two_ball IN(1,2,3,4,5) then 1 else 0 end) twoSmall,
+         SUM(case when number_two_ball IN(6,7,8,9,10) then 1 else 0 end) twoBig,
+         SUM(case when number_two_ball IN(1,3,5,7,9) then 1 else 0 end) twoSingle,
+         SUM(case when number_two_ball IN(2,4,6,8,10) then 1 else 0 end) twoDouble,
+		 SUM(case when number_three_ball IN(1,2,3,4,5) then 1 else 0 end) threeSmall,
+         SUM(case when number_three_ball IN(6,7,8,9,10) then 1 else 0 end) threeBig,
+         SUM(case when number_three_ball IN(1,3,5,7,9) then 1 else 0 end) threeSingle,
+         SUM(case when number_three_ball IN(2,4,6,8,10) then 1 else 0 end) threeDouble,
+		 SUM(case when number_four_ball IN(1,2,3,4,5) then 1 else 0 end) fourSmall,
+         SUM(case when number_four_ball IN(6,7,8,9,10) then 1 else 0 end) fourBig,
+         SUM(case when number_four_ball IN(1,3,5,7,9) then 1 else 0 end) fourSingle,
+         SUM(case when number_four_ball IN(2,4,6,8,10) then 1 else 0 end) fourDouble,
+		 SUM(case when number_five_ball IN(1,2,3,4,5) then 1 else 0 end) fiveSmall,
+         SUM(case when number_five_ball IN(6,7,8,9,10) then 1 else 0 end) fiveBig,
+         SUM(case when number_five_ball IN(1,3,5,7,9) then 1 else 0 end) fiveSingle,
+         SUM(case when number_five_ball IN(2,4,6,8,10) then 1 else 0 end) fiveDouble,
+		 SUM(case when number_six_ball IN(1,2,3,4,5) then 1 else 0 end) sixSmall,
+         SUM(case when number_six_ball IN(6,7,8,9,10) then 1 else 0 end) sixBig,
+         SUM(case when number_six_ball IN(1,3,5,7,9) then 1 else 0 end) sixSingle,
+         SUM(case when number_six_ball IN(2,4,6,8,10) then 1 else 0 end) sixDouble,
+		 SUM(case when number_seven_ball IN(1,2,3,4,5) then 1 else 0 end) sevenSmall,
+         SUM(case when number_seven_ball IN(6,7,8,9,10) then 1 else 0 end) sevenBig,
+         SUM(case when number_seven_ball IN(1,3,5,7,9) then 1 else 0 end) sevenSingle,
+         SUM(case when number_seven_ball IN(2,4,6,8,10) then 1 else 0 end) sevenDouble,
+		 SUM(case when number_eight_ball IN(1,2,3,4,5) then 1 else 0 end) eightSmall,
+         SUM(case when number_eight_ball IN(6,7,8,9,10) then 1 else 0 end) eightBig,
+         SUM(case when number_eight_ball IN(1,3,5,7,9) then 1 else 0 end) eightSingle,
+         SUM(case when number_eight_ball IN(2,4,6,8,10) then 1 else 0 end) eightDouble,
+		 SUM(case when number_nine_ball IN(1,2,3,4,5) then 1 else 0 end) nineSmall,
+         SUM(case when number_nine_ball IN(6,7,8,9,10) then 1 else 0 end) nineBig,
+         SUM(case when number_nine_ball IN(1,3,5,7,9) then 1 else 0 end) nineSingle,
+         SUM(case when number_nine_ball IN(2,4,6,8,10) then 1 else 0 end) nineDouble,
+		 SUM(case when number_ten_ball IN(1,2,3,4,5) then 1 else 0 end) tenSmall,
+         SUM(case when number_ten_ball IN(6,7,8,9,10) then 1 else 0 end) tenBig,
+         SUM(case when number_ten_ball IN(1,3,5,7,9) then 1 else 0 end) tenSingle,
+         SUM(case when number_ten_ball IN(2,4,6,8,10) then 1 else 0 end) tenDouble
+		 FROM t_variety_current
+		 where DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+	</select>
+
+    <select id="querySscStatistics" parameterType="java.lang.Object" resultType="java.util.Map">
+    SELECT
+    SUM(case when first_dragon_tiger ='龙'  then 1 else 0 end) longCount,
+    SUM(case when first_dragon_tiger ='虎'  then 1 else 0 end) huCount,
+    SUM(case when first_dragon_tiger ='和'  then 1 else 0 end) heCount
+    FROM t_variety_current where  variety_type = #{varietyType}
+    <choose>
+        <when test="varietyType == 3 or varietyType ==7">
+           AND substring(expect,1,8) = replace(CURDATE(),'-','')
+        </when>
+        <otherwise>
+          AND  DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+        </otherwise>
+    </choose>
+
+  </select>
+
+    <select id="queryExpect" parameterType="java.lang.Integer"
+            resultType="com.bh.live.pojo.res.inform.OpenStatisticsCodeRes">
+        SELECT
+            a.expect aexpect,
+            a.open_code aopencode,
+            b.expect bexpect,
+            b.open_code bopencode
+          FROM
+            (
+                SELECT
+                expect,
+                open_code,
+                number_one_ball
+            FROM
+                t_variety_current
+            where  variety_type = #{varietyType}
+            <choose>
+                <when test="varietyType ==3 or varietyType ==7">
+                    AND substring(expect,1,8) = replace(CURDATE(),'-','')
+                </when>
+                <otherwise>
+                    AND DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+                </otherwise>
+            </choose>
+            ORDER by
+                expect DESC
+             ) as a,
+            (
+            SELECT
+                expect,
+                open_code
+            FROM
+                t_variety_current
+            where variety_type = #{varietyType}
+        <choose>
+            <when test="varietyType ==3 or varietyType ==7">
+                AND substring(expect,1,8) = replace(CURDATE(),'-','')
+            </when>
+            <otherwise>
+                AND DATE_FORMAT(open_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+            </otherwise>
+        </choose>
+            ORDER by
+                expect DESC
+             ) as b
+        WHERE
+            a.expect = b.expect + 1 order by b.expect asc
+    </select>
+</mapper>

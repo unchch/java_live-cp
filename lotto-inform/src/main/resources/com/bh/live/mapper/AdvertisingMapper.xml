@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.AdvertisingDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.announcement.Advertising">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="describes" property="describes" />
+        <result column="internal_chain" property="internalChain" />
+        <result column="other_chain" property="otherChain" />
+        <result column="terrace" property="terrace" />
+        <result column="is_release" property="isRelease" />
+        <result column="img" property="img" />
+        <result column="creation_time" property="creationTime" />
+        <result column="valid_time" property="validTime" />
+        <result column="modification_time" property="modificationTime" />
+        <result column="plan_up_time" property="planUpTime" />
+        <result column="plan_down_time" property="planDownTime" />
+        <result column="title" property="title" />
+        <result column="sort" property="sort" />
+        <result column="author" property="author" />
+        <result column="modify" property="modify" />
+        <result column="status" property="status" />
+        <result column="type" property="type" />
+        <result column="is_recommend" property="isRecommend" />
+        <result column="file_name" property="fileName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, describes, internal_chain, other_chain, terrace, is_release, img, creation_time, valid_time, modification_time, plan_up_time, plan_down_time, title, sort, author, modify, status, type, is_recommend, file_name
+    </sql>
+
+</mapper>

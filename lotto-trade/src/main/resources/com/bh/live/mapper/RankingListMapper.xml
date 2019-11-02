@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.RankingListDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.bh.live.model.rankingList.RankingList">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="user_type" property="userType" />
+		<result column="popularity_value" property="popularityValue" />
+		<result column="treasure_value" property="treasureValue" />
+		<result column="winging_value" property="wingingValue" />
+		<result column="winrate_value" property="winrateValue" />
+		<result column="profitrate_value" property="profitrateValue" />
+		<result column="rank_period" property="rankPeriod" />
+		<result column="is_usable" property="isUsable" />
+		<result column="update_time" property="updateTime" />
+		<result column="creat_time" property="creatTime" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, user_id, popularity_value, treasure_value,
+		winging_value,
+		winrate_value, profitrate_value, rank_period, is_usable,
+		update_time,
+		creat_time
+	</sql>
+
+</mapper>

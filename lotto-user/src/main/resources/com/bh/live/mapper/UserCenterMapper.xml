@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.user.dao.UserCenterDao">
+    <update id="updatenickName">
+        update lotto_live_user
+            set nickname =#{nickname}
+        where id =#{userId}
+    </update>
+
+    <update id="updatePassword">
+         update lotto_live_user
+            set password =#{password}
+        where id =#{userId}
+    </update>
+    <update id="updateEditNameCount">
+      update lotto_live_user set edit_name_count =#{count}
+      where id=#{userId}
+    </update>
+
+    <select id="queryUserById" resultType="com.bh.live.pojo.res.user.UserBaseInfoRes">
+        SELECT
+            u.id,
+            u.nickname,
+            u.image_url,
+            u.mobile,
+            u.is_anchor,
+            u.is_expert,
+            u.is_usable,
+            u.edit_name_count,
+            ( SELECT count( 1 ) FROM lotto_attention WHERE user_id = u.id and is_attent =1 ) attent_count,
+            ( SELECT count( 1 ) FROM lotto_attention WHERE target_id = u.id and is_attent =1 ) fans_count,
+            ifnull((SELECT verify_status FROM lotto_host_user WHERE user_id= u.id),-1) as verify_status,
+            w.all_money,
+            w.depositl_money
+        FROM
+            lotto_live_user u,
+            lotto_wallet w
+        WHERE
+            w.user_id = u.id
+            AND u.id =#{userId}
+    </select>
+    <select id="checkNickName" resultType="java.lang.Integer">
+          SELECT count(1) FROM lotto_live_user
+          WHERE id !=  #{userId} AND nickname = #{nickname}
+    </select>
+    <select id="queryUserInfo" resultType="com.bh.live.pojo.res.user.UserBaseInfoRes">
+         SELECT
+            u.id,
+            u.nickname,
+            u.image_url,
+            u.mobile,
+            u.is_anchor,
+            u.is_expert,
+            u.is_usable,
+            ( SELECT count( 1 ) FROM lotto_attention WHERE target_id = u.id and is_attent =1 ) attent_count,
+            <choose>
+                <when test="userId!=null">
+                    (SELECT count(1) FROM lotto_attention WHERE target_id =u.id AND user_id = #{userId}  and is_attent =1 ) as is_attent
+                </when>
+                <otherwise>
+                    0 as is_attent
+                </otherwise>
+            </choose>
+        FROM
+            lotto_live_user u
+        WHERE
+             u.id =#{targetId}
+    </select>
+
+
+</mapper>

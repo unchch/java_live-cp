@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.trade.dao.SeedDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.lottery.Seed">
+        <id column="id" property="id" />
+        <result column="seed_no" property="seedNo" />
+        <result column="seed_name" property="seedName" />
+        <result column="category_no" property="categoryNo" />
+        <result column="description" property="description" />
+        <result column="refer_issue_no" property="referIssueNo" />
+        <result column="create_days" property="createDays" />
+        <result column="created_date" property="createdDate" />
+        <result column="stop_bet_interval" property="stopBetInterval" />
+        <result column="show_able" property="showAble" />
+        <result column="show_home_page" property="showHomePage" />
+        <result column="sale_state" property="saleState" />
+        <result column="seed_desc" property="seedDesc" />
+        <result column="play_mode_recommend" property="playModeRecommend" />
+        <result column="official_play_recommend" property="officialPlayRecommend" />
+        <result column="official_play_no" property="officialPlayNo" />
+        <result column="credit_play_recommend" property="creditPlayRecommend" />
+        <result column="credit_play_no" property="creditPlayNo" />
+        <result column="prize_mode" property="prizeMode" />
+        <result column="cover_pc_icon" property="coverPcIcon" />
+        <result column="cover_app_icon" property="coverAppIcon" />
+        <result column="logo_pc_icon" property="logoPcIcon" />
+        <result column="logo_app_icon" property="logoAppIcon" />
+        <result column="image_icon" property="imageIcon" />
+        <result column="status" property="status" />
+        <result column="sort" property="sort" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, seed_no, seed_name, category_no, description, refer_issue_no, create_days, created_date, stop_bet_interval, show_able, show_home_page, sale_state, seed_desc, play_mode_recommend, official_play_recommend, official_play_no, credit_play_recommend, credit_play_no, prize_mode, cover_pc_icon, cover_app_icon, logo_pc_icon, logo_app_icon, image_icon, status, sort, update_by, update_time
+    </sql>
+
+</mapper>

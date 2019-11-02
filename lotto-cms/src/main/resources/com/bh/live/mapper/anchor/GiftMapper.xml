@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.anchor.GiftDao">
+
+    <delete id="delete" parameterType="list">
+      update lotto_gift set is_delete = 1 where id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="queryGiftPage" resultType="com.bh.live.pojo.req.anchor.GiftReq">
+        select * FROM lotto_gift WHERE is_delete=0
+        <if test="gift!=null">
+            <if test="gift.id!=null and gift.id!=''">
+                AND id=#{gift.id}
+            </if>
+            <if test="gift.categoryId!=null and gift.categoryId!=''">
+                AND category_id=#{gift.categoryId}
+            </if>
+            <if test="gift.giftName!=null and gift.giftName!=''">
+                AND gift_name like "%${gift.giftName}%"
+            </if>
+        </if>
+    </select>
+</mapper>

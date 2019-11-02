@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.NumberBigSmallMissDao">
+
+    <select id="currentOmission" resultType="com.bh.live.model.inform.Omission">
+        select expect,${fieldCondition} from t_variety_current
+        WHERE variety_type = #{varietyType} ORDER BY open_time DESC
+    </select>
+
+    <select id="getAppearCount" resultType="com.bh.live.model.inform.Omission">
+        select ball numberBall,ifnull(b.totalCount,0) todayAppear from (
+        select 1 ball union select 2 union
+        select 3 union select 4 union select 5 union select 6
+        union select 7 union select 8 union select 9 union
+        <choose>
+            <when test="varietyType == 2 || varietyType == 3"> select 0 </when>
+            <otherwise> select 10</otherwise>
+        </choose>
+        <choose>
+            <when test="varietyType == 9">union select 11 </when>
+        </choose>) a
+        left join
+        (select ${field},
+        count(expect) totalCount FROM t_variety_current tv where variety_type = #{varietyType}
+        <if test="dateType == 'today'">
+            <choose>
+                <when test="varietyType==0">
+                    and left(tv.expect,8) = DATE_FORMAT(NOW(),'%Y%m%d')
+                </when>
+                <otherwise>
+                    and tv.open_time BETWEEN CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 00:00:00')
+                    and CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 23:59:59')
+                </otherwise>
+            </choose>
+        </if>
+        <if test="dateType == 'week'">
+            <choose>
+                <when test="varietyType==0">
+                    and YEARWEEK(str_to_date(left(tv.expect,8), '%Y%m%d') - INTERVAL 1 DAY)= yearweek(now() - INTERVAL 1 DAY)
+                </when>
+                <otherwise>
+                    and YEARWEEK(date_format(open_time,'%Y-%m-%d') - INTERVAL 1 DAY) = yearweek(now() - INTERVAL 1 DAY)
+                </otherwise>
+            </choose>
+        </if>
+        <if test="dateType == 'month'">
+            <choose>
+                <when test="varietyType==0">
+                    and str_to_date(left(tv.expect,8), '%Y%m%d')
+                    BETWEEN CONCAT(date_format(LAST_DAY(now()),'%Y-%m-'),'01 00:00:00')
+                    and CONCAT(LAST_DAY(now()),' 23:59:59')
+                </when>
+                <otherwise>
+                    and tv.open_time BETWEEN CONCAT(date_format(LAST_DAY(now()),'%Y-%m-'),'01 00:00:00')
+                    and CONCAT(LAST_DAY(now()),' 23:59:59')
+                </otherwise>
+            </choose>
+        </if>
+        GROUP BY ${field}) b
+        on a.ball = b.${field}
+    </select>
+
+    <!--sql注入（勿删）-->
+    <select id="getDateOmission" resultType="com.bh.live.model.inform.Omission">
+        ${sql}
+    </select>
+
+    <!--获取当日、本周、本月出现次数小于2的遗漏情况-->
+    <select id="getMaxCrownSub" resultType="com.bh.live.model.inform.Omission">
+        select expect,crown_sub from
+            ((SELECT tv.expect,tv.crown_sub FROM `t_variety_current` tv
+                    WHERE variety_type = #{varietyType} AND crown_sub = #{crownSub}
+                    ORDER BY tv.open_time DESC LIMIT 2)
+            UNION ALL
+            (SELECT tv.expect,tv.crown_sub FROM `t_variety_current` tv WHERE variety_type = #{varietyType}
+            ORDER BY tv.open_time DESC LIMIT 1)) a order by expect desc
+    </select>
+
+    <!--历史遗漏-->
+    <select id="historyOmission" resultType="com.bh.live.model.inform.Omission">
+        SELECT
+            tv.crown_sub crownSub,
+            count(tv.expect) historyOmi
+        FROM
+            `t_variety_current` tv
+        WHERE tv.variety_type = #{varietyType}
+        GROUP BY tv.crown_sub
+    </select>
+
+
+
+</mapper>

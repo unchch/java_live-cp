@@ -1,0 +1,67 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://dev-db1.yzkj.net:3306/db_live?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: root
+    password: 123456
+    druid:
+      #初始化连接数
+      initial-size: 1
+      #最小空闲连接数
+      min-idle: 10
+      #最大连接数
+      max-active: 100
+      #获取连接等待超时的时间
+      max-wait: 60000
+      filters: stat,config
+      stat-view-servlet:
+        #是否开启监控
+        enabled: true
+        #监控访问路径
+        url-pattern: /druid/*
+        #允许清空统计数据
+        reset-stat-enable: true
+        login-username: druid
+        login-password: druid
+        allow:
+  #mq配置
+  rabbitmq:
+    addresses: 192.168.2.240:5672,192.168.2.240:15672,192.168.2.240:25672
+    username: rbmq
+    password: 123456
+  #redis配置
+  redis:
+    host: 192.168.2.240
+    port: 6379
+    password: 123456
+    database: 0
+    jedis:
+      pool:
+        max-active: 800
+        max-idle: 20
+        min-idle: 2
+#注册服务到注册中心
+eureka:
+  instance:
+    prefer-ip-address: true #注册服务的ip
+    lease-renewal-interval-in-seconds: 5      # 心跳时间，即服务续约间隔时间（缺省为30s）
+    lease-expiration-duration-in- : 10  # 发呆时间，即服务续约到期时间（缺省为90s）
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+  client:
+    register-with-eureka: true #使用Eureka注册服务
+    fetch-registry: true #在本地缓存注册表
+    service-url:
+      defaultZone: http://uat-livebase-eureka.yzkj.net/eureka #Eureka服务位置
+    registry-fetch-interval-seconds: 5 #eureka client间隔多久去拉取服务注册信息，默认为30秒
+    healthcheck:
+      enabled: true  # 开启健康检查（依赖spring-boot-starter-actuator）
+# 日志配置
+logging:
+  level:
+    com.bh.live: debug
+    org.springframework: warn
+
+
+
+
+

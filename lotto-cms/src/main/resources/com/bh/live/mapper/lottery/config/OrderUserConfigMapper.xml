@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.lottery.config.OrderUserConfigDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.lottery.config.OrderUserConfig">
+        <id column="id" property="id" />
+        <result column="user_type" property="userType" />
+        <result column="lottery_code" property="lotteryCode" />
+        <result column="price_type" property="priceType" />
+        <result column="date_type" property="dateType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, lottery_code,user_type, price_type, date_type, create_time, update_time, create_by, modify_by
+    </sql>
+
+</mapper>

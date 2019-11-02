@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.TwoFaceOmitDao">
+
+    <select id="currentOmission" resultType="com.bh.live.model.inform.Omission">
+        SELECT
+            expect,
+            crownSubDesc
+        FROM
+            (( SELECT expect,${field} FROM t_variety_current WHERE ${condition} AND variety_type = #{varietyType} )
+            UNION ALL
+            ( SELECT expect,${field} FROM t_variety_current WHERE variety_type = #{varietyType} ORDER BY open_time DESC LIMIT 1 )
+            ) s
+        ORDER BY
+            expect DESC
+    </select>
+
+    <select id="getAppearCount" resultType="com.bh.live.model.inform.Omission">
+        SELECT tv.big_small crownSubDesc,count(big_small) todayAppear
+         FROM `t_variety_current` tv where variety_type = #{varietyType}
+        ${condition} GROUP BY tv.big_small
+        UNION ALL
+        SELECT tv.single_double,count(single_double) todayAppear
+         FROM `t_variety_current` tv where variety_type = #{varietyType}
+        ${condition} GROUP BY tv.single_double
+    </select>
+
+    <!--sql注入（勿删）-->
+    <select id="getDateOmission" resultType="com.bh.live.model.inform.Omission">
+        ${sql}
+    </select>
+
+    <!--获取当日、本周、本月出现次数小于2的遗漏情况-->
+    <select id="getMaxCrownSub" resultType="com.bh.live.model.inform.Omission">
+        select expect,crown_sub from
+            ((SELECT tv.expect,tv.crown_sub FROM `t_variety_current` tv
+                    WHERE variety_type = #{varietyType} AND crown_sub = #{crownSub}
+                    ORDER BY tv.open_time DESC LIMIT 2)
+            UNION ALL
+            (SELECT tv.expect,tv.crown_sub FROM `t_variety_current` tv WHERE variety_type = #{varietyType}
+            ORDER BY tv.open_time DESC LIMIT 1)) a order by expect desc
+    </select>
+
+    <!--历史遗漏-->
+    <select id="historyOmission" resultType="com.bh.live.model.inform.Omission">
+        SELECT
+            tv.crown_sub crownSub,
+            count(tv.expect) historyOmi
+        FROM
+            `t_variety_current` tv
+        WHERE tv.variety_type = #{varietyType}
+        GROUP BY tv.crown_sub
+    </select>
+
+</mapper>

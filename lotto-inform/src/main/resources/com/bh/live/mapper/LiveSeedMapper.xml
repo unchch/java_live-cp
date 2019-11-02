@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.dao.LiveSeedDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bh.live.model.anchor.LiveSeed">
+        <id column="ls_id" property="lsId" />
+        <result column="seed_no" property="seedNo" />
+        <result column="category_no" property="categoryNo" />
+        <result column="seed_name" property="seedName" />
+        <result column="live_count" property="liveCount" />
+        <result column="cover" property="cover" />
+        <result column="status" property="status" />
+        <result column="sort" property="sort" />
+        <result column="recommend_index" property="recommendIndex" />
+        <result column="is_del" property="isDel" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ls_id, seed_no, category_no, seed_name, live_count, cover, status, sort, recommend_index, is_del
+    </sql>
+
+</mapper>

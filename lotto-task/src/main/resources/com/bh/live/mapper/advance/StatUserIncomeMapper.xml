@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bh.live.task.dao.advance.StatUserIncomeDao">
+
+    <!--按天统计所有主播的收入(注：未区分等级分成和礼物分成)-->
+    <select id="statIncome" resultType="com.bh.live.model.anchor.StatUserIncome">
+      SELECT
+            a.*,
+            b.divide,
+            ( b.divide * a.amount ) income
+        FROM
+            (
+        SELECT
+            tua.tv_user_id userId,
+            DATE_FORMAT( tua.create_time, '%Y-%m-%d' ) statDate,
+            sum( tua.gift_num ) giftCount,
+            sum( tua.amount ) giftAmount
+        FROM
+            lotto_trade_user_award tua
+        GROUP BY
+            tua.tv_user_id,
+            DATE_FORMAT( tua.create_time, '%Y-%m-%d' )
+            ) a
+            LEFT JOIN (
+          SELECT u.id, ( SELECT divide_into FROM lotto_grade_divide_into WHERE u.user_grade BETWEEN min_lv AND max_lv ) divide FROM lotto_live_user u ) b
+          ON a.tv_user_id = b.id
+    </select>
+
+</mapper>
