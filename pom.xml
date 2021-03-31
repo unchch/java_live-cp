@@ -31,7 +31,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <guava.version>26.0-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <fastjson.version>1.2.54</fastjson.version>
         <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
         <spring-boot.version>2.1.4.RELEASE</spring-boot.version>
