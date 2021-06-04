@@ -50,7 +50,7 @@
         <hutool.version>4.5.11</hutool.version>
         <commons.codec.version>1.10</commons.codec.version>
         <swagger.models.version>1.5.22</swagger.models.version>
-        <httpClients.version>4.5.7</httpClients.version>
+        <httpClients.version>4.5.13</httpClients.version>
         <jjwt.version>0.9.0</jjwt.version>
         <commons.lang3.version>3.7</commons.lang3.version>
         <google.collect.version>1.0-rc1</google.collect.version>
