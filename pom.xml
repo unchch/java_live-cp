@@ -45,7 +45,7 @@
         <mybatis.baomidou.version>3.1.2</mybatis.baomidou.version>
         <apache.cxf.version>3.2.4</apache.cxf.version>
         <jwt.version>3.4.0</jwt.version>
-        <shiro.version>1.4.0</shiro.version>
+        <shiro.version>1.7.1</shiro.version>
         <mysql.connector.version>8.0.16</mysql.connector.version>
         <hutool.version>4.5.11</hutool.version>
         <commons.codec.version>1.10</commons.codec.version>
