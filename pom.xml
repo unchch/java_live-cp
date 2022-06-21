@@ -46,7 +46,7 @@
         <apache.cxf.version>3.2.4</apache.cxf.version>
         <jwt.version>3.4.0</jwt.version>
         <shiro.version>1.4.0</shiro.version>
-        <mysql.connector.version>8.0.16</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
         <hutool.version>4.5.11</hutool.version>
         <commons.codec.version>1.10</commons.codec.version>
         <swagger.models.version>1.5.22</swagger.models.version>
